@@ -1,0 +1,15 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.google.auto:auto-common:0.10'
+    implementation 'com.google.auto.service:auto-service:1.0-rc6'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc6'
+    implementation 'com.squareup:javapoet:1.9.0'
+    implementation project(':libPrefsBuilderCore')
+    // compileOnly 'com.google.android:android:4.1.1.4'
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

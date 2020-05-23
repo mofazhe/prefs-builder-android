@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
+
+    defaultConfig {
+        applicationId "com.mfz.demo"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                // 设置生成类的包名，前后缀
+                // 指定统一包名
+                arguments += ['prefsBuilderPkg': 'com.prefs.']
+                // 指定统一前缀
+                arguments += ['prefsBuilderClassPrefix': 'My']
+                // 指定统一后缀
+                arguments += ['prefsBuilderClassSuffix': 'Prefs']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0'
+
+    // prefs builder
+    implementation project(':libPrefsBuilderCore')
+    annotationProcessor project(':libPrefsBuilderAnntationProcessor')
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
+    // Tray：https://github.com/grandcentrix/tray
+    implementation 'net.grandcentrix.tray:tray:0.12.0'
+    // 快速生成泛型：https://github.com/ikidou/TypeBuilder
+    implementation 'com.github.ikidou:TypeBuilder:1.0'
+}
