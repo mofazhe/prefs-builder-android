@@ -1,4 +1,44 @@
 apply plugin: 'java-library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+ext {
+    bintrayRepo = 'prefs-builder'   //this is the repository name on the bintray site
+    bintrayName = 'anntation-processor'//this is the package name on the bintray site,
+    // so if this package already exists then it will take that but if it doesnt
+    // exist then it will craete the package with the name in the above repository
+
+    publishedGroupId = 'com.mfz.prefbuilder'
+    artifact = 'anntation-processor'
+    libraryVersion = '0.0.1' // publishedGroupId:artifact:libraryVersion
+    libraryName = 'anntation-processor' //libraryname, artifact must be same as the library module name
+    libraryDescription = 'Prefs builder'
+
+    // github url & git repo
+    siteUrl = 'https://github.com/mofazhe/PrefsBuilder-demo'
+    gitUrl = 'https://github.com/mofazhe/PrefsBuilder-demo.git'
+
+    // developer config
+    developerId = 'mfz' // jenter show idname
+    developerName = 'mfz' // actually name
+    developerEmail = 'mfzhemail@gmail.com'
+
+    // license
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+        tags += ['date', 'time']
+    }
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -11,5 +51,13 @@ dependencies {
     // compileOnly 'com.google.android:android:4.1.1.4'
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 sourceCompatibility = "7"
 targetCompatibility = "7"
+
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

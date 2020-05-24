@@ -621,7 +621,7 @@ public @interface PrefsVal {
     }
 
     /**
-     * {@link android.util.SparseArray}类型
+     * SparseArray类型
      * 需要设置序列化和反序列化方法(序列化可使用object的)
      * 这是android库的类，若使用Gson库则需要手动添加序列化与反序列化适配器
      */
