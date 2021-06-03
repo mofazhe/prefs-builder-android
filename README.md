@@ -1,14 +1,24 @@
 # Prefs Builder
-![LatestVersion](https://img.shields.io/badge/PrefsBuilder-0.1.2-green)
+![LatestVersion](https://maven-badges.herokuapp.com/maven-central/io.github.mofazhe/prefs-builder-core/badge.png)
 
-## 文档
-暂无
+
+## 内容列表
+
+- [简介](#简介)
+- [使用说明](#使用说明)
+- [示例](#示例)
+- [文档](#文档)
+- [致谢](#致谢)
+- [使用许可](#使用许可)
+
 
 ## 简介
 使用注解生成偏好代码。已开放接口，可以使用其他的偏好替代品实现持久化存储
+<br/>
 可以自定义序列化方法，目前只测试了gson的兼容性，其他库暂未测试
 
-## 使用
+
+## 使用说明
 
 > 1.导入依赖
 ```gradle
@@ -68,4 +78,33 @@
     // 写入
     UserPrefs.setTestInt(234);
 ```
+
+
+## 示例
+
+[PrefsBuilder](https://github.com/mofazhe/PrefsBuilder-demo)
+
+
+## 文档
+
+暂无
+
+
+## 致谢
+
+本项目参考以下项目
+
+[Glide](https://github.com/bumptech/glide)
+<br/>
+[Butter Knife](https://github.com/JakeWharton/butterknife)
+<br/>
+[EventBus](https://github.com/greenrobot/EventBus)
+<br/>
+[Standard Readme](https://github.com/RichardLitt/standard-readme)
+
+
+## 使用许可
+
+该项目签署了Apache License 2.0 授权许可，详情请参阅[LICENSE](https://github.com/mofazhe/PrefsBuilder-demo/blob/master/LICENSE)
+
 
