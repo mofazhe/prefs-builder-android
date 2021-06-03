@@ -48,7 +48,7 @@ public @interface PrefsClass {
     boolean currentPkg() default true;
 
     /**
-     * 默认为统一classname转小写中间用下划线分隔
+     * 默认为最终classname转小写中间用下划线分隔
      *
      * @return the string
      */
