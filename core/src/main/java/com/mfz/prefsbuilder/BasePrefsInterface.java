@@ -160,4 +160,20 @@ public interface BasePrefsInterface {
      * @param val the val
      */
     void setString(String key, String val);
+
+    /**
+     * 移除key
+     *
+     * @param key the key
+     * @return the boolean
+     */
+    boolean remove(String key);
+
+    /**
+     * 是否包含该key
+     *
+     * @param key the key
+     * @return the boolean
+     */
+    boolean contains(String key);
 }

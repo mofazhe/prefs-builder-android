@@ -2,6 +2,10 @@ package com.mfz.demo.utils;
 
 import android.util.SparseArray;
 
+import com.mfz.prefsbuilder.DefaultValue;
+import com.mfz.prefsbuilder.PrefsClass;
+import com.mfz.prefsbuilder.PrefsVal;
+
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -11,10 +15,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
-
-import com.mfz.prefsbuilder.DefaultValue;
-import com.mfz.prefsbuilder.PrefsClass;
-import com.mfz.prefsbuilder.PrefsVal;
 
 /**
  * @author mz
@@ -29,7 +29,7 @@ public class PrefsConst {
         public static final String TEST_INT = "null";
         @PrefsVal.String(defNull = true)
         public static final String TEST_STRING = "b";
-        @PrefsVal.String(defVal = "111")
+        @PrefsVal.String(defVal = "111", defNull = false)
         public static final String TEST_STRING_NOT = "b";
         @PrefsVal.Byte()
         public static final String TEST_BYTE = "c";

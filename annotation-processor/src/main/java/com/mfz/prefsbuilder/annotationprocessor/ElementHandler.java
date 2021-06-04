@@ -346,6 +346,8 @@ public class ElementHandler {
         TypeName prefixTypeName = null;
         TypeName suffixTypeName = null;
         int codecId = -1;
+        boolean generateRemove = true;
+        boolean generateContains = true;
         for (Class<? extends Annotation> cls : AnnotationList.getPrefsVal()) {
             annotation = variableElement.getAnnotation(cls);
             prefixTypeName = MethodUtils.getPrefixType(element, cls, mElementUtils);
@@ -355,6 +357,8 @@ public class ElementHandler {
                 PrefsVal.Int annotationObj = (PrefsVal.Int) annotation;
                 defValue = annotationObj.defVal();
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Int";
                 type = 1;
                 break;
@@ -363,6 +367,8 @@ public class ElementHandler {
                 PrefsVal.Float annotationObj = (PrefsVal.Float) annotation;
                 defValue = annotationObj.defVal() + "f";
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Float";
                 type = 1;
                 break;
@@ -371,6 +377,8 @@ public class ElementHandler {
                 PrefsVal.Bool annotationObj = (PrefsVal.Bool) annotation;
                 defValue = annotationObj.defVal();
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Bool";
                 type = 1;
                 break;
@@ -379,6 +387,8 @@ public class ElementHandler {
                 PrefsVal.Byte annotationObj = (PrefsVal.Byte) annotation;
                 defValue = StringUtils.format("(byte)%d", annotationObj.defVal());
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Byte";
                 type = 1;
                 break;
@@ -387,6 +397,8 @@ public class ElementHandler {
                 PrefsVal.Double annotationObj = (PrefsVal.Double) annotation;
                 defValue = annotationObj.defVal();
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Double";
                 type = 1;
                 break;
@@ -400,6 +412,8 @@ public class ElementHandler {
                     defValue = StringUtils.format("(char)%d", (int) defChar);
                 }
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Char";
                 type = 1;
                 break;
@@ -408,6 +422,8 @@ public class ElementHandler {
                 PrefsVal.Long annotationObj = (PrefsVal.Long) annotation;
                 defValue = annotationObj.defVal();
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Long";
                 type = 1;
                 break;
@@ -416,6 +432,8 @@ public class ElementHandler {
                 PrefsVal.Short annotationObj = (PrefsVal.Short) annotation;
                 defValue = StringUtils.format("(short)%d", annotationObj.defVal());
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "Short";
                 type = 1;
                 break;
@@ -428,6 +446,8 @@ public class ElementHandler {
                     defValue = annotationObj.defVal();
                 }
                 defValFromId = annotationObj.defValFromId();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 valueName = "String";
                 codecId = annotationObj.codecId();
                 type = 1;
@@ -438,6 +458,8 @@ public class ElementHandler {
                 defValFromId = annotationObj.defValFromId();
                 defNull = annotationObj.defNull();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.List) {
@@ -450,6 +472,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.Set) {
@@ -462,6 +486,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.Queue) {
@@ -474,6 +500,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.Deque) {
@@ -486,6 +514,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.SparseArray) {
@@ -499,6 +529,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             } else if (annotation instanceof PrefsVal.Map) {
@@ -513,6 +545,8 @@ public class ElementHandler {
                 defNull = annotationObj.defNull();
                 defEmpty = annotationObj.defEmpty();
                 defString = annotationObj.defString();
+                generateRemove = annotationObj.generateRemove();
+                generateContains = annotationObj.generateContains();
                 type = 2;
                 break;
             }
@@ -520,23 +554,53 @@ public class ElementHandler {
 
         switch (type) {
             case 1:
-                buildBasicMethod(classBuilder, filedName, valueName, defValue, currentClass,
-                        typeName, defValFromId, prefixTypeName, suffixTypeName, codecId);
+                buildBasicMethod(classBuilder,
+                        filedName,
+                        valueName,
+                        defValue,
+                        currentClass,
+                        typeName,
+                        defValFromId,
+                        prefixTypeName,
+                        suffixTypeName,
+                        codecId,
+                        generateRemove,
+                        generateContains);
                 break;
             case 2:
-                buildGenericMethod(classBuilder, filedName, currentClass, annotation,
-                        typeName, keyTypeName, valTypeName, defValFromId, defNull, defEmpty, defString,
-                        suffixTypeName, prefixTypeName);
+                buildGenericMethod(classBuilder,
+                        filedName,
+                        currentClass,
+                        annotation,
+                        typeName,
+                        keyTypeName,
+                        valTypeName,
+                        defValFromId,
+                        defNull,
+                        defEmpty,
+                        defString,
+                        suffixTypeName,
+                        prefixTypeName,
+                        generateRemove,
+                        generateContains);
                 break;
             default:
                 break;
         }
     }
 
-    private void buildBasicMethod(TypeSpec.Builder classBuilder, String filedName, String valueName,
-                                  Object defValue, ClassName currentClass, TypeName typeName,
-                                  int defValFromId, TypeName prefixTypeName, TypeName suffixTypeName,
-                                  int codecId) {
+    private void buildBasicMethod(TypeSpec.Builder classBuilder,
+                                  String filedName,
+                                  String valueName,
+                                  Object defValue,
+                                  ClassName currentClass,
+                                  TypeName typeName,
+                                  int defValFromId,
+                                  TypeName prefixTypeName,
+                                  TypeName suffixTypeName,
+                                  int codecId,
+                                  boolean generateRemove,
+                                  boolean generateContains) {
         MethodSpec.Builder methodBuilder;
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         MethodInfo methodInfo;
@@ -655,13 +719,56 @@ public class ElementHandler {
         }
         methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
+
+        // remove方法
+        CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
+        codeRemoveBuilder.addStatement(StringUtils.format(
+                "return getInstance().remove(%s)", keyStatement), currentClass);
+
+        if (generateRemove) {
+            addRemoveMethod(classBuilder,
+                    keyStatement,
+                    currentClass,
+                    filedName,
+                    typeName,
+                    prefixTypeName,
+                    suffixTypeName,
+                    hasPrefix,
+                    hasSuffix,
+                    prefixTxt,
+                    suffixTxt);
+        }
+
+        if (generateContains) {
+            addContainsMethod(classBuilder,
+                    keyStatement,
+                    currentClass,
+                    filedName,
+                    typeName,
+                    prefixTypeName,
+                    suffixTypeName,
+                    hasPrefix,
+                    hasSuffix,
+                    prefixTxt,
+                    suffixTxt);
+        }
     }
 
-    private void buildGenericMethod(TypeSpec.Builder classBuilder, String filedName,
-                                    ClassName currentClass, Annotation annotation,
-                                    TypeName typeName, TypeName keyTypeName, TypeName valTypeName,
-                                    int defValFromId, boolean defNull, boolean defEmpty,
-                                    String defString, TypeName prefixTypeName, TypeName suffixTypeName) {
+    private void buildGenericMethod(TypeSpec.Builder classBuilder,
+                                    String filedName,
+                                    ClassName currentClass,
+                                    Annotation annotation,
+                                    TypeName typeName,
+                                    TypeName keyTypeName,
+                                    TypeName valTypeName,
+                                    int defValFromId,
+                                    boolean defNull,
+                                    boolean defEmpty,
+                                    String defString,
+                                    TypeName prefixTypeName,
+                                    TypeName suffixTypeName,
+                                    boolean generateRemove,
+                                    boolean generateContains) {
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
         boolean hasPrefix = prefixTypeName != null && prefixTypeName != TypeName.VOID;
@@ -827,6 +934,94 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
+        if (hasPrefix) {
+            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+        }
+        if (hasSuffix) {
+            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+        }
+        methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
+        classBuilder.addMethod(methodBuilder.build());
+
+        if (generateRemove) {
+            addRemoveMethod(classBuilder,
+                    keyStatement,
+                    currentClass,
+                    filedName,
+                    typeName,
+                    prefixTypeName,
+                    suffixTypeName,
+                    hasPrefix,
+                    hasSuffix,
+                    prefixTxt,
+                    suffixTxt);
+        }
+
+        if (generateContains) {
+            addContainsMethod(classBuilder,
+                    keyStatement,
+                    currentClass,
+                    filedName,
+                    typeName,
+                    prefixTypeName,
+                    suffixTypeName,
+                    hasPrefix,
+                    hasSuffix,
+                    prefixTxt,
+                    suffixTxt);
+        }
+    }
+
+    private void addRemoveMethod(TypeSpec.Builder classBuilder,
+                                 String keyStatement,
+                                 ClassName currentClass,
+                                 String filedName,
+                                 TypeName typeName,
+                                 TypeName prefixTypeName,
+                                 TypeName suffixTypeName,
+                                 boolean hasPrefix,
+                                 boolean hasSuffix,
+                                 String prefixTxt,
+                                 String suffixTxt) {
+        CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
+        codeRemoveBuilder.addStatement(StringUtils.format(
+                "return getInstance().remove(%s)", keyStatement), currentClass);
+
+        MethodSpec.Builder methodBuilder;
+        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getRemoveMethodName(filedName))
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.BOOLEAN)
+                .addCode(codeRemoveBuilder.build());
+        if (hasPrefix) {
+            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+        }
+        if (hasSuffix) {
+            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+        }
+        methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addContainsMethod(TypeSpec.Builder classBuilder,
+                                 String keyStatement,
+                                 ClassName currentClass,
+                                 String filedName,
+                                 TypeName typeName,
+                                 TypeName prefixTypeName,
+                                 TypeName suffixTypeName,
+                                 boolean hasPrefix,
+                                 boolean hasSuffix,
+                                 String prefixTxt,
+                                 String suffixTxt) {
+        CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
+        codeRemoveBuilder.addStatement(StringUtils.format(
+                "return getInstance().contains(%s)", keyStatement), currentClass);
+
+        MethodSpec.Builder methodBuilder;
+        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getContainsMethodName(filedName))
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(TypeName.BOOLEAN)
+                .addCode(codeRemoveBuilder.build());
         if (hasPrefix) {
             methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
         }

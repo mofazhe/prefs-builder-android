@@ -20,14 +20,6 @@ public class BasePrefs implements BasePrefsInterface {
         mPreferences = new TrayPreferences(Utils.getContext(), name, 1);
     }
 
-    public boolean remove(String key) {
-        return mPreferences.remove(key);
-    }
-
-    public boolean contains(final String key) {
-        return mPreferences.contains(key);
-    }
-
     public void registerOnChangeListener(OnTrayPreferenceChangeListener listener) {
         try {
             mPreferences.registerOnTrayPreferenceChangeListener(listener);
@@ -40,6 +32,16 @@ public class BasePrefs implements BasePrefsInterface {
             mPreferences.unregisterOnTrayPreferenceChangeListener(listener);
         } catch (Exception ignore) {
         }
+    }
+
+    @Override
+    public boolean remove(String key) {
+        return mPreferences.remove(key);
+    }
+
+    @Override
+    public boolean contains(final String key) {
+        return mPreferences.contains(key);
     }
 
     @Override

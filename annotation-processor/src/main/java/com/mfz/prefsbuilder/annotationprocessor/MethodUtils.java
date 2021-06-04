@@ -35,6 +35,14 @@ public class MethodUtils {
         return "set" + StringUtils.const2BigCamel(filedName);
     }
 
+    public static String getRemoveMethodName(String filedName) {
+        return "remove" + StringUtils.const2BigCamel(filedName);
+    }
+
+    public static String getContainsMethodName(String filedName) {
+        return "contains" + StringUtils.const2BigCamel(filedName);
+    }
+
     public static TypeName getType(Element element, Class<?> clazz, Elements elements) {
         return transformerClass(element, "type", clazz, elements);
     }

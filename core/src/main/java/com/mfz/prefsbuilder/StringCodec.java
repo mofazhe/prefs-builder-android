@@ -21,7 +21,7 @@ public class StringCodec {
         /**
          * 根据该id调用方法与{@link PrefsVal.String#codecId()}对应
          * 该id可以与{@link DefaultValue}重复
-         * 注意1：该id应该与{@link Encode}成对出现，否则编码回出现问题
+         * 注意1：该id应该与{@link Encode}成对出现，否则编码会出现问题
          * 注意2：仅限使用大于0的值
          *
          * @return the int

@@ -54,6 +54,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -89,6 +103,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -124,6 +152,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -159,6 +201,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -194,6 +250,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -229,6 +299,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -264,6 +348,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -299,6 +397,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -311,7 +423,7 @@ public class PrefsVal {
         /**
          * 默认值从该id关联的注解静态方法中获取，该静态方法最多仅能有一个参数，
          * 返回的对象必须是String
-         * 大于0的值才有效
+         * 大于0的值才有效，此时该值优先级最高
          *
          * @return 关联的id int
          */
@@ -326,7 +438,9 @@ public class PrefsVal {
         java.lang.String defVal() default "";
 
         /**
-         * 默认值是否为null，若为true，则其他的默认值无效
+         * 默认值是否为null，
+         * 若为true，{@link String#defVal()}无效，
+         * {@link String#defValFromId()}有效时，该值无效
          *
          * @return 是否为null boolean
          */
@@ -353,6 +467,20 @@ public class PrefsVal {
          * @return the int
          */
         int codecId() default 0;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -406,6 +534,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -469,6 +611,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -532,6 +688,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -594,6 +764,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -656,6 +840,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -719,6 +917,20 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 
     /**
@@ -788,5 +1000,19 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> suffixType() default void.class;
+
+        /**
+         * 是否要生成对应的remove方法
+         *
+         * @return the boolean
+         */
+        boolean generateRemove() default true;
+
+        /**
+         * 是否要生成对应的contains方法
+         *
+         * @return the boolean
+         */
+        boolean generateContains() default true;
     }
 }
