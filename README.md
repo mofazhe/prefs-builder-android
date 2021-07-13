@@ -82,7 +82,7 @@
 
 ## 示例
 
-[PrefsBuilder](https://github.com/mofazhe/PrefsBuilder-demo)
+[PrefsBuilder](https://github.com/mofazhe/prefs-builder-android)
 
 
 ## 文档
@@ -105,6 +105,6 @@
 
 ## 使用许可
 
-该项目签署了Apache License 2.0 授权许可，详情请参阅[LICENSE](https://github.com/mofazhe/PrefsBuilder-demo/blob/master/LICENSE)
+该项目签署了Apache License 2.0 授权许可，详情请参阅[LICENSE](https://github.com/mofazhe/prefs-builder-android/blob/master/LICENSE)
 
 
