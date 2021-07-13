@@ -5,7 +5,8 @@ if (project.getPlugins().hasPlugin('com.android.application') ||
     // Android libraries
     pkgType = "aar"
     task sourcesJar(type: Jar) {
-        classifier = 'sources'
+        // classifier = 'sources'
+        getArchiveClassifier().set("sources")
         from android.sourceSets.main.java.srcDirs
     }
 
@@ -19,7 +20,8 @@ if (project.getPlugins().hasPlugin('com.android.application') ||
     // Java libraries
     pkgType = "jar"
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        // classifier = 'sources'
+        getArchiveClassifier().set("sources")
         from sourceSets.main.allSource
     }
 }
@@ -30,15 +32,16 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.withType(Javadoc) {
-    options.encoding = "utf-8"
-    options.charSet = "utf-8"
+    options.encoding = "UTF-8"
+    options.charSet = "UTF-8"
     options.author = true
     options.version = true
     options.tags += ['date', 'time']
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    // classifier = 'javadoc'
+    getArchiveClassifier().set("javadoc")
     from javadoc.destinationDir
 }
 
@@ -113,8 +116,8 @@ uploadArchives {
             pom.project {
                 packaging pkgType
 
-                def gitUrl = "https://github.com/mofazhe/PrefsBuilder-demo"
-                def gitScheme = "scm:git@github.com:mofazhe/PrefsBuilder-demo.git"
+                def gitUrl = "https://github.com/mofazhe/prefs-builder-android"
+                def gitScheme = "scm:git@github.com:mofazhe/prefs-builder-android.git"
 
                 name libraryName // '发布库的简单名称'
                 // optionally artifactId can be defined here
