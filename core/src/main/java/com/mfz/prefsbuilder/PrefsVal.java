@@ -23,14 +23,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Int {
-        /**
-         * 默认值的方法
-         * 优先级高
-         * 仅限使用大于0的值
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * 默认值
@@ -38,36 +30,6 @@ public class PrefsVal {
          * @return the int
          */
         int defVal() default 0;
-
-        /**
-         * key的前缀class类型
-         * 注意：使用的是该类的{@link java.lang.Object#toString()}方法
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * key的后缀class类型.
-         * 注意：使用的是该类的{@link java.lang.Object#toString()}方法
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -76,12 +38,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Float {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val float.
@@ -89,34 +45,6 @@ public class PrefsVal {
          * @return the float
          */
         float defVal() default 0f;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -125,12 +53,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Bool {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val boolean.
@@ -138,34 +60,6 @@ public class PrefsVal {
          * @return the boolean
          */
         boolean defVal() default false;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -174,12 +68,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Byte {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val byte.
@@ -187,34 +75,6 @@ public class PrefsVal {
          * @return the byte
          */
         byte defVal() default 0;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -223,12 +83,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Double {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val double.
@@ -236,34 +90,6 @@ public class PrefsVal {
          * @return the double
          */
         double defVal() default 0.0;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -272,12 +98,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Char {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val char.
@@ -285,34 +105,6 @@ public class PrefsVal {
          * @return the char
          */
         char defVal() default '\0';
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -321,12 +113,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Long {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val long.
@@ -334,34 +120,6 @@ public class PrefsVal {
          * @return the long
          */
         long defVal() default 0L;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -370,12 +128,6 @@ public class PrefsVal {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.FIELD)
     public @interface Short {
-        /**
-         * Def val from id int.
-         *
-         * @return the int
-         */
-        int defValFromId() default 0;
 
         /**
          * Def val short.
@@ -383,34 +135,6 @@ public class PrefsVal {
          * @return the short
          */
         short defVal() default 0;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -421,66 +145,12 @@ public class PrefsVal {
     public @interface String {
 
         /**
-         * 默认值从该id关联的注解静态方法中获取，该静态方法最多仅能有一个参数，
-         * 返回的对象必须是String
-         * 大于0的值才有效，此时该值优先级最高
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
          * 默认值
          * 优先级最低
          *
          * @return the java . lang . string
          */
         java.lang.String defVal() default "";
-
-        /**
-         * 默认值是否为null，
-         * 若为true，{@link String#defVal()}无效，
-         * {@link String#defValFromId()}有效时，该值无效
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default true;
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 编解码方法id，string特有参数
-         * 注意：编解码的方法应该共用一个id，若不成对出现将会出错
-         *
-         * @return the int
-         */
-        int codecId() default 0;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -497,57 +167,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法中获取，该静态方法最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link #type()}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -564,67 +183,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link #type()}
-         *
-         * @return 关联的key int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defEmpty()} ()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -641,67 +199,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link #type()}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         * {@link #defEmpty()} ()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -718,66 +215,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link #type()}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -794,66 +231,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link java.util.Deque}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -871,66 +248,6 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> type();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link java.util.Deque}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 
     /**
@@ -954,65 +271,5 @@ public class PrefsVal {
          * @return the class
          */
         Class<?> valType();
-
-        /**
-         * 默认值从该key关联的注解静态方法或常量中获取，若为静态方法，则最多仅能有一个参数，
-         * 返回的对象必须是该类型{@link java.util.Map}
-         *
-         * @return 关联的id int
-         */
-        int defValFromId() default 0;
-
-        /**
-         * 默认值是否为null，当为true时，那么其他默认值无效
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defNull() default false;
-
-        /**
-         * 默认值是否为空列表，
-         * 优先级低于{@link #defNull()}
-         * {@link #defValFromId()}
-         *
-         * @return 是否为null boolean
-         */
-        boolean defEmpty() default true;
-
-        /**
-         * 默认的string
-         *
-         * @return 字符串 java . lang . string
-         */
-        java.lang.String defString() default "";
-
-        /**
-         * Prefix type class.
-         *
-         * @return the class
-         */
-        Class<?> prefixType() default void.class;
-
-        /**
-         * Suffix type class.
-         *
-         * @return the class
-         */
-        Class<?> suffixType() default void.class;
-
-        /**
-         * 是否要生成对应的remove方法
-         *
-         * @return the boolean
-         */
-        boolean generateRemove() default true;
-
-        /**
-         * 是否要生成对应的contains方法
-         *
-         * @return the boolean
-         */
-        boolean generateContains() default true;
     }
 }

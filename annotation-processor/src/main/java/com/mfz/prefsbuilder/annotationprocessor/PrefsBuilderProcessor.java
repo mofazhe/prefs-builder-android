@@ -16,6 +16,7 @@ import javax.lang.model.element.TypeElement;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
 import com.mfz.prefsbuilder.DefaultValue;
+import com.mfz.prefsbuilder.PrefParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.StringCodec;
 
@@ -58,6 +59,7 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
         for (Class<? extends Annotation> c : AnnotationList.getRuleMethod().keySet()) {
             annotations.add(c.getCanonicalName());
         }
+        annotations.add(PrefParams.class.getCanonicalName());
         return annotations;
     }
 

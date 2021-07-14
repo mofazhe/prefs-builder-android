@@ -2,6 +2,7 @@ package com.mfz.prefsbuilder.annotationprocessor;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
 import com.mfz.prefsbuilder.DefaultValue;
+import com.mfz.prefsbuilder.PrefParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsVal;
 import com.mfz.prefsbuilder.StringCodec;
@@ -338,70 +339,51 @@ public class ElementHandler {
         Object defValue = null;
         String valueName = "String";
         ClassName currentClass = ClassName.bestGuess(qualifiedName);
-        int defValFromId = -1;
-        boolean defNull = false;
-        boolean defEmpty = false;
-        String defString = null;
+        // int defValFromId = -1;
+        // boolean defNull = false;
+        // boolean defEmpty = false;
+        // String defString = null;
         int type = 0;
-        TypeName prefixTypeName = null;
-        TypeName suffixTypeName = null;
-        int codecId = -1;
-        boolean generateRemove = true;
-        boolean generateContains = true;
+        // TypeName prefixTypeName = null;
+        // TypeName suffixTypeName = null;
+        // int codecId = -1;
+        // boolean generateRemove = true;
+        // boolean generateContains = true;
+        PrefParamsData paramsData = null;
         for (Class<? extends Annotation> cls : AnnotationList.getPrefsVal()) {
             annotation = variableElement.getAnnotation(cls);
-            prefixTypeName = MethodUtils.getPrefixType(element, cls, mElementUtils);
-            suffixTypeName = MethodUtils.getSuffixType(element, cls, mElementUtils);
+            // prefixTypeName = MethodUtils.getPrefixType(element, cls, mElementUtils);
+            // suffixTypeName = MethodUtils.getSuffixType(element, cls, mElementUtils);
             if (annotation instanceof PrefsVal.Int) {
                 typeName = TypeName.INT;
                 PrefsVal.Int annotationObj = (PrefsVal.Int) annotation;
                 defValue = annotationObj.defVal();
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Int";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Float) {
                 typeName = TypeName.FLOAT;
                 PrefsVal.Float annotationObj = (PrefsVal.Float) annotation;
                 defValue = annotationObj.defVal() + "f";
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Float";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Bool) {
                 typeName = TypeName.BOOLEAN;
                 PrefsVal.Bool annotationObj = (PrefsVal.Bool) annotation;
                 defValue = annotationObj.defVal();
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Bool";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Byte) {
                 typeName = TypeName.BYTE;
                 PrefsVal.Byte annotationObj = (PrefsVal.Byte) annotation;
                 defValue = StringUtils.format("(byte)%d", annotationObj.defVal());
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Byte";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Double) {
                 typeName = TypeName.DOUBLE;
                 PrefsVal.Double annotationObj = (PrefsVal.Double) annotation;
                 defValue = annotationObj.defVal();
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Double";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Char) {
                 typeName = TypeName.CHAR;
                 PrefsVal.Char annotationObj = (PrefsVal.Char) annotation;
@@ -411,128 +393,70 @@ public class ElementHandler {
                 } else {
                     defValue = StringUtils.format("(char)%d", (int) defChar);
                 }
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Char";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Long) {
                 typeName = TypeName.LONG;
                 PrefsVal.Long annotationObj = (PrefsVal.Long) annotation;
                 defValue = annotationObj.defVal();
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Long";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Short) {
                 typeName = TypeName.SHORT;
                 PrefsVal.Short annotationObj = (PrefsVal.Short) annotation;
                 defValue = StringUtils.format("(short)%d", annotationObj.defVal());
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
                 valueName = "Short";
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.String) {
                 typeName = mStringTypeName;
                 PrefsVal.String annotationObj = (PrefsVal.String) annotation;
-                if (annotationObj.defNull()) {
-                    defValue = null;
-                } else {
-                    defValue = annotationObj.defVal();
-                }
-                defValFromId = annotationObj.defValFromId();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // if (annotationObj.defNull()) {
+                //     defValue = null;
+                // } else {
+                defValue = annotationObj.defVal();
+                // }
                 valueName = "String";
-                codecId = annotationObj.codecId();
                 type = 1;
-                break;
             } else if (annotation instanceof PrefsVal.Object) {
                 typeName = keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                PrefsVal.Object annotationObj = (PrefsVal.Object) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.Object annotationObj = (PrefsVal.Object) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.List) {
                 keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 if (keyTypeName != null) {
                     typeName = ParameterizedTypeName.get(ClassName.get(List.class), keyTypeName);
                 }
-                PrefsVal.List annotationObj = (PrefsVal.List) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.List annotationObj = (PrefsVal.List) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.Set) {
                 keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 if (keyTypeName != null) {
                     typeName = ParameterizedTypeName.get(ClassName.get(Set.class), keyTypeName);
                 }
-                PrefsVal.Set annotationObj = (PrefsVal.Set) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.Set annotationObj = (PrefsVal.Set) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.Queue) {
                 keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 if (keyTypeName != null) {
                     typeName = ParameterizedTypeName.get(ClassName.get(Queue.class), keyTypeName);
                 }
-                PrefsVal.Queue annotationObj = (PrefsVal.Queue) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.Queue annotationObj = (PrefsVal.Queue) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.Deque) {
                 keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 if (keyTypeName != null) {
                     typeName = ParameterizedTypeName.get(ClassName.get(Deque.class), keyTypeName);
                 }
-                PrefsVal.Deque annotationObj = (PrefsVal.Deque) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.Deque annotationObj = (PrefsVal.Deque) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.SparseArray) {
                 keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 if (keyTypeName != null) {
                     typeName = ParameterizedTypeName.get(
                             ClassName.bestGuess("android.util.SparseArray"), keyTypeName);
                 }
-                PrefsVal.SparseArray annotationObj = (PrefsVal.SparseArray) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.SparseArray annotationObj = (PrefsVal.SparseArray) annotation;
                 type = 2;
-                break;
             } else if (annotation instanceof PrefsVal.Map) {
                 keyTypeName = MethodUtils.getKeyType(element, cls, mElementUtils);
                 valTypeName = MethodUtils.getValType(element, cls, mElementUtils);
@@ -540,15 +464,34 @@ public class ElementHandler {
                     typeName = ParameterizedTypeName.get(
                             ClassName.get(Map.class), keyTypeName, valTypeName);
                 }
-                PrefsVal.Map annotationObj = (PrefsVal.Map) annotation;
-                defValFromId = annotationObj.defValFromId();
-                defNull = annotationObj.defNull();
-                defEmpty = annotationObj.defEmpty();
-                defString = annotationObj.defString();
-                generateRemove = annotationObj.generateRemove();
-                generateContains = annotationObj.generateContains();
+                // PrefsVal.Map annotationObj = (PrefsVal.Map) annotation;
                 type = 2;
+            }
+            if (annotation != null) {
                 break;
+            }
+        }
+
+        PrefParams prefParams = variableElement.getAnnotation(PrefParams.class);
+        if (prefParams == null) {
+            paramsData = PrefParamsData.newBuilder().build();
+        } else {
+            paramsData = PrefParamsData.newBuilder()
+                    .prefixTypeName(MethodUtils.getPrefixType(element, PrefParams.class, mElementUtils))
+                    .suffixTypeName(MethodUtils.getSuffixType(element, PrefParams.class, mElementUtils))
+                    .defValFromId(prefParams.defValFromId())
+                    .generateRemove(prefParams.generateRemove())
+                    .generateContains(prefParams.generateContains())
+                    .codeId(prefParams.codecId())
+                    .defNull(prefParams.defNull())
+                    .defEmpty(prefParams.defEmpty())
+                    .defString(prefParams.defString())
+                    .build();
+        }
+
+        if (mStringTypeName.equals(typeName)) {
+            if (paramsData.isDefNull()) {
+                defValue = null;
             }
         }
 
@@ -560,12 +503,7 @@ public class ElementHandler {
                         defValue,
                         currentClass,
                         typeName,
-                        defValFromId,
-                        prefixTypeName,
-                        suffixTypeName,
-                        codecId,
-                        generateRemove,
-                        generateContains);
+                        paramsData);
                 break;
             case 2:
                 buildGenericMethod(classBuilder,
@@ -575,14 +513,7 @@ public class ElementHandler {
                         typeName,
                         keyTypeName,
                         valTypeName,
-                        defValFromId,
-                        defNull,
-                        defEmpty,
-                        defString,
-                        suffixTypeName,
-                        prefixTypeName,
-                        generateRemove,
-                        generateContains);
+                        paramsData);
                 break;
             default:
                 break;
@@ -595,17 +526,14 @@ public class ElementHandler {
                                   Object defValue,
                                   ClassName currentClass,
                                   TypeName typeName,
-                                  int defValFromId,
-                                  TypeName prefixTypeName,
-                                  TypeName suffixTypeName,
-                                  int codecId,
-                                  boolean generateRemove,
-                                  boolean generateContains) {
+                                  PrefParamsData paramsData) {
         MethodSpec.Builder methodBuilder;
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         MethodInfo methodInfo;
-        boolean hasPrefix = prefixTypeName != null && prefixTypeName != TypeName.VOID;
-        boolean hasSuffix = suffixTypeName != null && suffixTypeName != TypeName.VOID;
+        boolean hasPrefix = paramsData.getPrefixTypeName() != null
+                && paramsData.getPrefixTypeName() != TypeName.VOID;
+        boolean hasSuffix = paramsData.getSuffixTypeName() != null
+                && paramsData.getSuffixTypeName() != TypeName.VOID;
         String prefixTxt = "prefix";
         String suffixTxt = "suffix";
 
@@ -622,9 +550,9 @@ public class ElementHandler {
         keyStatement = StringUtils.format(keyStatement, filedName);
 
         // get方法
-        methodInfo = mUserMethodParams.get(defValFromId);
-        if (defValFromId > 0 && methodInfo == null) {
-            canNotFindDefVal(defValFromId);
+        methodInfo = mUserMethodParams.get(paramsData.getDefValFromId());
+        if (paramsData.getDefValFromId() > 0 && methodInfo == null) {
+            canNotFindDefVal(paramsData.getDefValFromId());
         }
         if (methodInfo == null) {
             // string类型非空时需要处理特殊字符
@@ -649,7 +577,7 @@ public class ElementHandler {
             codeGetBuilder.addStatement(StringUtils.format(
                     "$T defVal=$T.%s", methodInfo.getName()), typeName, methodInfo.getClassName());
         }
-        methodInfo = mDecodeMethodMap.get(codecId);
+        methodInfo = mDecodeMethodMap.get(paramsData.getCodeId());
         if (methodInfo == null) {
             codeGetBuilder.addStatement(
                     StringUtils.format("return getInstance().get%s(%s, defVal)",
@@ -680,16 +608,16 @@ public class ElementHandler {
                 .returns(typeName)
                 .addCode(codeGetBuilder.build());
         if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), prefixTxt, Modifier.FINAL);
         }
         if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), suffixTxt, Modifier.FINAL);
         }
         classBuilder.addMethod(methodBuilder.build());
 
         // set方法
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        methodInfo = mEncodeMethodMap.get(codecId);
+        methodInfo = mEncodeMethodMap.get(paramsData.getCodeId());
         if (methodInfo == null) {
             codeSetBuilder.addStatement(StringUtils.format(
                     "getInstance().set%s(%s, value)", valueName, keyStatement), currentClass);
@@ -712,10 +640,10 @@ public class ElementHandler {
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
         if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), prefixTxt, Modifier.FINAL);
         }
         if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), suffixTxt, Modifier.FINAL);
         }
         methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
@@ -725,28 +653,28 @@ public class ElementHandler {
         codeRemoveBuilder.addStatement(StringUtils.format(
                 "return getInstance().remove(%s)", keyStatement), currentClass);
 
-        if (generateRemove) {
+        if (paramsData.isGenerateRemove()) {
             addRemoveMethod(classBuilder,
                     keyStatement,
                     currentClass,
                     filedName,
                     typeName,
-                    prefixTypeName,
-                    suffixTypeName,
+                    paramsData.getPrefixTypeName(),
+                    paramsData.getSuffixTypeName(),
                     hasPrefix,
                     hasSuffix,
                     prefixTxt,
                     suffixTxt);
         }
 
-        if (generateContains) {
+        if (paramsData.isGenerateContains()) {
             addContainsMethod(classBuilder,
                     keyStatement,
                     currentClass,
                     filedName,
                     typeName,
-                    prefixTypeName,
-                    suffixTypeName,
+                    paramsData.getPrefixTypeName(),
+                    paramsData.getSuffixTypeName(),
                     hasPrefix,
                     hasSuffix,
                     prefixTxt,
@@ -761,18 +689,13 @@ public class ElementHandler {
                                     TypeName typeName,
                                     TypeName keyTypeName,
                                     TypeName valTypeName,
-                                    int defValFromId,
-                                    boolean defNull,
-                                    boolean defEmpty,
-                                    String defString,
-                                    TypeName prefixTypeName,
-                                    TypeName suffixTypeName,
-                                    boolean generateRemove,
-                                    boolean generateContains) {
+                                    PrefParamsData paramsData) {
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        boolean hasPrefix = prefixTypeName != null && prefixTypeName != TypeName.VOID;
-        boolean hasSuffix = suffixTypeName != null && suffixTypeName != TypeName.VOID;
+        boolean hasPrefix = paramsData.getPrefixTypeName() != null
+                && paramsData.getPrefixTypeName() != TypeName.VOID;
+        boolean hasSuffix = paramsData.getSuffixTypeName() != null
+                && paramsData.getSuffixTypeName() != TypeName.VOID;
         String prefixTxt = "prefix";
         String suffixTxt = "suffix";
         MethodSpec.Builder methodBuilder;
@@ -826,7 +749,7 @@ public class ElementHandler {
         // get方法
         codeGetBuilder.addStatement(StringUtils.format(
                 "$T json = getInstance().get%s(%s, $S)",
-                valueName, keyStatement), mStringTypeName, currentClass, defString);
+                valueName, keyStatement), mStringTypeName, currentClass, paramsData.getDefString());
         if (valTypeName == null) {
             if (deserializerMethod.getParamsNum() == 2) {
                 codeGetBuilder.addStatement(StringUtils.format(
@@ -854,9 +777,9 @@ public class ElementHandler {
                 notSupportMethod(serializerMethod, 3, 4);
             }
         }
-        if (defNull) {
+        if (paramsData.isDefNull()) {
             codeGetBuilder.addStatement("return value");
-        } else if (defEmpty) {
+        } else if (paramsData.isDefEmpty()) {
             codeGetBuilder.beginControlFlow("if(value==null)");
             if (annotation instanceof PrefsVal.List) {
                 TypeName defType = TypeName.get(ArrayList.class);
@@ -881,9 +804,9 @@ public class ElementHandler {
                     .endControlFlow();
         } else {
             codeGetBuilder.beginControlFlow("if(value==null)");
-            MethodInfo methodInfo = mUserMethodParams.get(defValFromId);
+            MethodInfo methodInfo = mUserMethodParams.get(paramsData.getDefValFromId());
             if (methodInfo == null) {
-                canNotFindDefVal(defValFromId);
+                canNotFindDefVal(paramsData.getDefValFromId());
             } else if (methodInfo.isMethod()) {
                 if (methodInfo.getParamsNum() == 0) {
                     codeGetBuilder.addStatement(StringUtils.format(
@@ -910,10 +833,10 @@ public class ElementHandler {
                 .returns(typeName)
                 .addCode(codeGetBuilder.build());
         if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), prefixTxt, Modifier.FINAL);
         }
         if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), suffixTxt, Modifier.FINAL);
         }
         classBuilder.addMethod(methodBuilder.build());
 
@@ -935,36 +858,36 @@ public class ElementHandler {
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
         if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), prefixTxt, Modifier.FINAL);
         }
         if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), suffixTxt, Modifier.FINAL);
         }
         methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
 
-        if (generateRemove) {
+        if (paramsData.isGenerateRemove()) {
             addRemoveMethod(classBuilder,
                     keyStatement,
                     currentClass,
                     filedName,
                     typeName,
-                    prefixTypeName,
-                    suffixTypeName,
+                    paramsData.getPrefixTypeName(),
+                    paramsData.getSuffixTypeName(),
                     hasPrefix,
                     hasSuffix,
                     prefixTxt,
                     suffixTxt);
         }
 
-        if (generateContains) {
+        if (paramsData.isGenerateContains()) {
             addContainsMethod(classBuilder,
                     keyStatement,
                     currentClass,
                     filedName,
                     typeName,
-                    prefixTypeName,
-                    suffixTypeName,
+                    paramsData.getPrefixTypeName(),
+                    paramsData.getSuffixTypeName(),
                     hasPrefix,
                     hasSuffix,
                     prefixTxt,
@@ -1003,16 +926,16 @@ public class ElementHandler {
     }
 
     private void addContainsMethod(TypeSpec.Builder classBuilder,
-                                 String keyStatement,
-                                 ClassName currentClass,
-                                 String filedName,
-                                 TypeName typeName,
-                                 TypeName prefixTypeName,
-                                 TypeName suffixTypeName,
-                                 boolean hasPrefix,
-                                 boolean hasSuffix,
-                                 String prefixTxt,
-                                 String suffixTxt) {
+                                   String keyStatement,
+                                   ClassName currentClass,
+                                   String filedName,
+                                   TypeName typeName,
+                                   TypeName prefixTypeName,
+                                   TypeName suffixTypeName,
+                                   boolean hasPrefix,
+                                   boolean hasSuffix,
+                                   String prefixTxt,
+                                   String suffixTxt) {
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
                 "return getInstance().contains(%s)", keyStatement), currentClass);
