@@ -349,7 +349,6 @@ public class ElementHandler {
         // int codecId = -1;
         // boolean generateRemove = true;
         // boolean generateContains = true;
-        PrefParamsData paramsData = null;
         for (Class<? extends Annotation> cls : AnnotationList.getPrefsVal()) {
             annotation = variableElement.getAnnotation(cls);
             // prefixTypeName = MethodUtils.getPrefixType(element, cls, mElementUtils);
@@ -473,6 +472,7 @@ public class ElementHandler {
         }
 
         PrefParams prefParams = variableElement.getAnnotation(PrefParams.class);
+        PrefParamsData paramsData;
         if (prefParams == null) {
             paramsData = PrefParamsData.newBuilder().build();
         } else {
