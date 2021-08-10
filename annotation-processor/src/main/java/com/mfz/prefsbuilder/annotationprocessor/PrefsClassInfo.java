@@ -10,12 +10,12 @@ import com.squareup.javapoet.ClassName;
 public class PrefsClassInfo {
     private ClassName mClassName;
     private String mFileName;
-    private ClassName mOriginalClassName;
+    private ClassName mKeyClassName;
 
     private PrefsClassInfo(Builder builder) {
         setClassName(builder.mClassName);
         setFileName(builder.mFileName);
-        setOriginalClassName(builder.mOriginalClassName);
+        setKeyClassName(builder.mKeyClassName);
     }
 
     public static Builder newBuilder() {
@@ -38,25 +38,25 @@ public class PrefsClassInfo {
         mFileName = fileName;
     }
 
-    public ClassName getOriginalClassName() {
-        return mOriginalClassName;
+    public ClassName getKeyClassName() {
+        return mKeyClassName;
     }
 
-    public void setOriginalClassName(ClassName originalClassName) {
-        mOriginalClassName = originalClassName;
+    public void setKeyClassName(ClassName keyClassName) {
+        mKeyClassName = keyClassName;
     }
 
     public Builder builder() {
         Builder builder = new Builder();
         builder.mClassName = getClassName();
         builder.mFileName = getFileName();
-        builder.mOriginalClassName = getOriginalClassName();
+        builder.mKeyClassName = getKeyClassName();
         return builder;
     }
 
     public static final class Builder {
         private String mFileName;
-        private ClassName mOriginalClassName;
+        private ClassName mKeyClassName;
         private ClassName mClassName;
 
         private Builder() {
@@ -71,8 +71,8 @@ public class PrefsClassInfo {
             return this;
         }
 
-        public Builder originalClassName(ClassName val) {
-            mOriginalClassName = val;
+        public Builder keyClassName(ClassName val) {
+            mKeyClassName = val;
             return this;
         }
 
