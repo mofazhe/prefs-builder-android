@@ -18,6 +18,11 @@ public class PrefParamsData {
     private TypeName mSuffixTypeName;
     private boolean mGenerateRemove;
     private boolean mGenerateContains;
+    private boolean mHasPrefix;
+    private boolean mHasSuffix;
+    private String mPrefixParamName;
+    private String mSuffixParamName;
+    private String mKeyStatement;
 
     private PrefParamsData(Builder builder) {
         setDefNull(builder.mDefNull);
@@ -29,6 +34,11 @@ public class PrefParamsData {
         setSuffixTypeName(builder.mSuffixTypeName);
         setGenerateRemove(builder.mGenerateRemove);
         setGenerateContains(builder.mGenerateContains);
+        setHasPrefix(builder.mHasPrefix);
+        setHasSuffix(builder.mHasSuffix);
+        setPrefixParamName(builder.mPrefixParamName);
+        setSuffixParamName(builder.mSuffixParamName);
+        setKeyStatement(builder.mKeyStatement);
     }
 
     public static Builder newBuilder() {
@@ -107,6 +117,46 @@ public class PrefParamsData {
         mGenerateContains = generateContains;
     }
 
+    public boolean isHasPrefix() {
+        return mHasPrefix;
+    }
+
+    public void setHasPrefix(boolean hasPrefix) {
+        mHasPrefix = hasPrefix;
+    }
+
+    public boolean isHasSuffix() {
+        return mHasSuffix;
+    }
+
+    public void setHasSuffix(boolean hasSuffix) {
+        mHasSuffix = hasSuffix;
+    }
+
+    public String getPrefixParamName() {
+        return mPrefixParamName;
+    }
+
+    public void setPrefixParamName(String prefixParamName) {
+        mPrefixParamName = prefixParamName;
+    }
+
+    public String getSuffixParamName() {
+        return mSuffixParamName;
+    }
+
+    public void setSuffixParamName(String suffixParamName) {
+        mSuffixParamName = suffixParamName;
+    }
+
+    public String getKeyStatement() {
+        return mKeyStatement;
+    }
+
+    public void setKeyStatement(String keyStatement) {
+        mKeyStatement = keyStatement;
+    }
+
     public Builder builder() {
         Builder builder = new Builder();
         builder.mDefNull = isDefNull();
@@ -118,6 +168,11 @@ public class PrefParamsData {
         builder.mSuffixTypeName = getSuffixTypeName();
         builder.mGenerateRemove = isGenerateRemove();
         builder.mGenerateContains = isGenerateContains();
+        builder.mHasPrefix = isHasPrefix();
+        builder.mHasSuffix = isHasSuffix();
+        builder.mPrefixParamName = getPrefixParamName();
+        builder.mSuffixParamName = getSuffixParamName();
+        builder.mKeyStatement = getKeyStatement();
         return builder;
     }
 
@@ -131,6 +186,11 @@ public class PrefParamsData {
         private TypeName mSuffixTypeName;
         private boolean mGenerateRemove;
         private boolean mGenerateContains;
+        private boolean mHasPrefix;
+        private boolean mHasSuffix;
+        private String mPrefixParamName;
+        private String mSuffixParamName;
+        private String mKeyStatement;
 
         private Builder() {
             mDefNull = true;
@@ -142,6 +202,11 @@ public class PrefParamsData {
             mSuffixTypeName = TypeName.VOID;
             mGenerateRemove = true;
             mGenerateContains = true;
+            mHasPrefix = false;
+            mHasSuffix = false;
+            mPrefixParamName = "prefix";
+            mSuffixParamName = "suffix";
+            mKeyStatement = "$T.%s";
         }
 
         public Builder defNull(boolean val) {
@@ -189,8 +254,51 @@ public class PrefParamsData {
             return this;
         }
 
-        public PrefParamsData build() {
-            return new PrefParamsData(this);
+        public Builder hasPrefix(boolean val) {
+            mHasPrefix = val;
+            return this;
+        }
+
+        public Builder hasSuffix(boolean val) {
+            mHasSuffix = val;
+            return this;
+        }
+
+        public Builder prefixParamName(String val) {
+            mPrefixParamName = val;
+            return this;
+        }
+
+        public Builder suffixParamName(String val) {
+            mSuffixParamName = val;
+            return this;
+        }
+
+        public Builder keyStatement(String val) {
+            mKeyStatement = val;
+            return this;
+        }
+
+        public PrefParamsData build(KeyParams params) {
+            boolean hasPrefix = mPrefixTypeName != null
+                    && mPrefixTypeName != TypeName.VOID;
+            boolean hasSuffix = mSuffixTypeName != null
+                    && mSuffixTypeName != TypeName.VOID;
+
+            String keyStatement;
+            if (hasPrefix && hasSuffix) {
+                keyStatement = mPrefixParamName + "+$T.%s+" + mSuffixParamName;
+            } else if (hasPrefix) {
+                keyStatement = mPrefixParamName + "+$T.%s";
+            } else if (hasSuffix) {
+                keyStatement = "$T.%s+" + mSuffixParamName;
+            } else {
+                keyStatement = "$T.%s";
+            }
+            keyStatement = StringUtils.format(keyStatement, params.getFiledName());
+            return new PrefParamsData(hasPrefix(hasPrefix)
+                    .hasSuffix(hasSuffix)
+                    .keyStatement(keyStatement));
         }
     }
 }

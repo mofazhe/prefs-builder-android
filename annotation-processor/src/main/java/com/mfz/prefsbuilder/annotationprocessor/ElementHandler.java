@@ -325,216 +325,114 @@ public class ElementHandler {
         String qualifiedName = enclosingElement.getQualifiedName().toString();
 
         VariableElement variableElement = (VariableElement) element;
-        // 注解的成员变量名
-        // String filedName = variableElement.getSimpleName().toString();
-        // 注解的成员变量类型
-        // String filedClassType = variableElement.asType().toString();
-        // 注解的成员变量类型
-        // String filedValue = (String) variableElement.getConstantValue();
-        // filedValue = wrapperQuotes(filedValue);
 
-        // TypeName typeName = mStringTypeName;
-        // TypeName keyTypeName = null;
-        // TypeName valTypeName = null;
-        // Annotation annotation = null;
-        // Object defValue = null;
-        // String valueName = "String";
-        // ClassName currentClass = ClassName.bestGuess(qualifiedName);
-        // int defValFromId = -1;
-        // boolean defNull = false;
-        // boolean defEmpty = false;
-        // String defString = null;
-        // int type = 0;
-        // TypeName prefixTypeName = null;
-        // TypeName suffixTypeName = null;
-        // int codecId = -1;
-        // boolean generateRemove = true;
-        // boolean generateContains = true;
         KeyParams.Builder builder = KeyParams.newBuilder()
                 .currentClass(ClassName.bestGuess(qualifiedName))
                 .filedName(variableElement.getSimpleName().toString())
                 .valueName("String")
                 .typeName(mStringTypeName);
+
         for (Class<? extends Annotation> cls : AnnotationList.getPrefsVal()) {
             Annotation annotation = variableElement.getAnnotation(cls);
-            builder.annotation(annotation);
-            // prefixTypeName = MethodUtils.getPrefixType(element, cls, mElementUtils);
-            // suffixTypeName = MethodUtils.getSuffixType(element, cls, mElementUtils);
             if (annotation instanceof PrefsVal.Int) {
-                // typeName = TypeName.INT;
                 PrefsVal.Int annotationObj = (PrefsVal.Int) annotation;
-                // defValue = annotationObj.defVal();
-                // valueName = "Int";
                 builder.typeName(TypeName.INT)
                         .defValue(annotationObj.defVal())
                         .valueName("Int");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Float) {
-                // typeName = TypeName.FLOAT;
                 PrefsVal.Float annotationObj = (PrefsVal.Float) annotation;
-                // defValue = annotationObj.defVal() + "f";
-                // valueName = "Float";
                 builder.typeName(TypeName.FLOAT)
                         .defValue(annotationObj.defVal() + "f")
                         .valueName("Float");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Bool) {
-                // typeName = TypeName.BOOLEAN;
                 PrefsVal.Bool annotationObj = (PrefsVal.Bool) annotation;
-                // defValue = annotationObj.defVal();
-                // valueName = "Bool";
                 builder.typeName(TypeName.BOOLEAN)
                         .defValue(annotationObj.defVal())
                         .valueName("Bool");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Byte) {
-                // typeName = TypeName.BYTE;
                 PrefsVal.Byte annotationObj = (PrefsVal.Byte) annotation;
-                // defValue = StringUtils.format("(byte)%d", annotationObj.defVal());
-                // valueName = "Byte";
                 builder.typeName(TypeName.BYTE)
                         .defValue(StringUtils.format("(byte)%d", annotationObj.defVal()))
                         .valueName("Byte");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Double) {
-                // typeName = TypeName.DOUBLE;
                 PrefsVal.Double annotationObj = (PrefsVal.Double) annotation;
-                // defValue = annotationObj.defVal();
-                // valueName = "Double";
                 builder.typeName(TypeName.DOUBLE)
                         .defValue(annotationObj)
                         .valueName("Double");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Char) {
-                // typeName = TypeName.CHAR;
                 PrefsVal.Char annotationObj = (PrefsVal.Char) annotation;
                 char defChar = annotationObj.defVal();
-                // if (Character.isDefined(defChar)) {
-                //     defValue = StringUtils.format("'%c'", defChar);
-                // } else {
-                //     defValue = StringUtils.format("(char)%d", (int) defChar);
-                // }
-                // valueName = "Char";
                 builder.typeName(TypeName.CHAR)
                         .defValue(Character.isDefined(defChar) ?
                                 StringUtils.format("'%c'", defChar) :
                                 StringUtils.format("(char)%d", (int) defChar))
                         .valueName("Char");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Long) {
-                // typeName = TypeName.LONG;
                 PrefsVal.Long annotationObj = (PrefsVal.Long) annotation;
-                // defValue = annotationObj.defVal();
-                // valueName = "Long";
                 builder.typeName(TypeName.LONG)
                         .defValue(annotationObj)
                         .valueName("Long");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Short) {
-                // typeName = TypeName.SHORT;
                 PrefsVal.Short annotationObj = (PrefsVal.Short) annotation;
-                // defValue = StringUtils.format("(short)%d", annotationObj.defVal());
-                // valueName = "Short";
                 builder.typeName(TypeName.SHORT)
                         .defValue(StringUtils.format("(short)%d", annotationObj.defVal()))
                         .valueName("Short");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.String) {
-                // typeName = mStringTypeName;
                 PrefsVal.String annotationObj = (PrefsVal.String) annotation;
-                // // if (annotationObj.defNull()) {
-                // //     defValue = null;
-                // // } else {
-                // defValue = annotationObj.defVal();
-                // // }
-                // valueName = "String";
                 builder.typeName(mStringTypeName)
                         .defValue(annotationObj.defVal())
                         .valueName("String");
-                // type = 1;
             } else if (annotation instanceof PrefsVal.Object) {
                 TypeName typeName = MethodUtils.getType(element, cls, mElementUtils);
-                // PrefsVal.Object annotationObj = (PrefsVal.Object) annotation;
                 builder.typeName(typeName)
                         .keyTypeName(typeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.List) {
                 TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(List.class, subTypeName))
                         .keyTypeName(subTypeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.Set) {
-                // keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                // if (keyTypeName != null) {
-                //     typeName = ParameterizedTypeName.get(ClassName.get(Set.class), keyTypeName);
-                // }
-                // PrefsVal.Set annotationObj = (PrefsVal.Set) annotation;
                 TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(Set.class, subTypeName))
                         .keyTypeName(subTypeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.Queue) {
-                // keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                // if (keyTypeName != null) {
-                //     typeName = ParameterizedTypeName.get(ClassName.get(Queue.class), keyTypeName);
-                // }
-                // PrefsVal.Queue annotationObj = (PrefsVal.Queue) annotation;
                 TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(Queue.class, subTypeName))
                         .keyTypeName(subTypeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.Deque) {
-                // keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                // if (keyTypeName != null) {
-                //     typeName = ParameterizedTypeName.get(ClassName.get(Deque.class), keyTypeName);
-                // }
-                // PrefsVal.Deque annotationObj = (PrefsVal.Deque) annotation;
                 TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(Deque.class, subTypeName))
                         .keyTypeName(subTypeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.SparseArray) {
-                // keyTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                // if (keyTypeName != null) {
-                //     typeName = ParameterizedTypeName.get(
-                //             ClassName.bestGuess("android.util.SparseArray"), keyTypeName);
-                // }
-                // PrefsVal.SparseArray annotationObj = (PrefsVal.SparseArray) annotation;
                 TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(ClassName.bestGuess("android.util.SparseArray"), subTypeName))
                         .keyTypeName(subTypeName)
                         .genericVal(true);
-                // type = 2;
             } else if (annotation instanceof PrefsVal.Map) {
-                // keyTypeName = MethodUtils.getKeyType(element, cls, mElementUtils);
-                // valTypeName = MethodUtils.getValType(element, cls, mElementUtils);
-                // if (keyTypeName != null && valTypeName != null) {
-                //     typeName = ParameterizedTypeName.get(
-                //             ClassName.get(Map.class), keyTypeName, valTypeName);
-                // }
-                // PrefsVal.Map annotationObj = (PrefsVal.Map) annotation;
                 TypeName keyTypeName = MethodUtils.getKeyType(element, cls, mElementUtils);
                 TypeName valTypeName = MethodUtils.getValType(element, cls, mElementUtils);
                 builder.typeName(getParameterizedTypedName(Map.class, keyTypeName, valTypeName))
                         .keyTypeName(keyTypeName)
                         .valTypeName(valTypeName)
                         .genericVal(true);
-                // type = 2;
             }
             if (annotation != null) {
+                builder.annotation(annotation);
                 break;
             }
         }
 
+        KeyParams params = builder
+                .build();
+
         PrefParams prefParams = variableElement.getAnnotation(PrefParams.class);
         PrefParamsData paramsData;
         if (prefParams == null) {
-            paramsData = PrefParamsData.newBuilder().build();
+            paramsData = PrefParamsData.newBuilder().build(params);
         } else {
             paramsData = PrefParamsData.newBuilder()
                     .prefixTypeName(MethodUtils.getPrefixType(element, PrefParams.class, mElementUtils))
@@ -546,15 +444,13 @@ public class ElementHandler {
                     .defNull(prefParams.defNull())
                     .defEmpty(prefParams.defEmpty())
                     .defString(prefParams.defString())
-                    .build();
+                    .build(params);
         }
 
-        KeyParams params = builder
-                .paramsData(paramsData)
-                .build();
+        params.setParamsData(paramsData);
+
         if (mStringTypeName.equals(params.getTypeName())) {
             if (paramsData.isDefNull()) {
-                // defValue = null;
                 params.setDefValue(null);
             }
         }
@@ -582,32 +478,16 @@ public class ElementHandler {
     }
 
     private void buildBasicMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        MethodSpec.Builder methodBuilder;
-        CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
-        MethodInfo methodInfo;
-        boolean hasPrefix = params.getParamsData().getPrefixTypeName() != null
-                && params.getParamsData().getPrefixTypeName() != TypeName.VOID;
-        boolean hasSuffix = params.getParamsData().getSuffixTypeName() != null
-                && params.getParamsData().getSuffixTypeName() != TypeName.VOID;
-        String prefixTxt = "prefix";
-        String suffixTxt = "suffix";
+        PrefParamsData paramsData = params.getParamsData();
 
-        String keyStatement;
-        if (hasPrefix && hasSuffix) {
-            keyStatement = prefixTxt + "+$T.%s+" + suffixTxt;
-        } else if (hasPrefix) {
-            keyStatement = prefixTxt + "+$T.%s";
-        } else if (hasSuffix) {
-            keyStatement = "$T.%s+" + suffixTxt;
-        } else {
-            keyStatement = "$T.%s";
-        }
-        keyStatement = StringUtils.format(keyStatement, params.getFiledName());
+        MethodSpec.Builder methodBuilder;
+        MethodInfo methodInfo;
 
         // get方法
-        methodInfo = mUserMethodParams.get(params.getParamsData().getDefValFromId());
-        if (params.getParamsData().getDefValFromId() > 0 && methodInfo == null) {
-            canNotFindDefVal(params.getParamsData().getDefValFromId());
+        CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
+        methodInfo = mUserMethodParams.get(paramsData.getDefValFromId());
+        if (paramsData.getDefValFromId() > 0 && methodInfo == null) {
+            canNotFindDefVal(paramsData.getDefValFromId());
         }
         if (methodInfo == null) {
             // string类型非空时需要处理特殊字符
@@ -623,7 +503,7 @@ public class ElementHandler {
                         "$T defVal=$T.%s()", methodInfo.getName()), params.getTypeName(), methodInfo.getClassName());
             } else if (methodInfo.getParamsNum() == 1) {
                 codeGetBuilder.addStatement(StringUtils.format(
-                        "$T defVal=$T.%s(%s)", methodInfo.getName(), keyStatement),
+                        "$T defVal=$T.%s(%s)", methodInfo.getName(), paramsData.getKeyStatement()),
                         params.getTypeName(), methodInfo.getClassName(), params.getCurrentClass());
             } else {
                 notSupportMethod(methodInfo, 0, 1);
@@ -632,21 +512,21 @@ public class ElementHandler {
             codeGetBuilder.addStatement(StringUtils.format(
                     "$T defVal=$T.%s", methodInfo.getName()), params.getTypeName(), methodInfo.getClassName());
         }
-        methodInfo = mDecodeMethodMap.get(params.getParamsData().getCodeId());
+        methodInfo = mDecodeMethodMap.get(paramsData.getCodeId());
         if (methodInfo == null) {
             codeGetBuilder.addStatement(
                     StringUtils.format("return getInstance().get%s(%s, defVal)",
-                            params.getValueName(), keyStatement), params.getCurrentClass());
+                            params.getValueName(), paramsData.getKeyStatement()), params.getCurrentClass());
         } else {
             codeGetBuilder.addStatement(
                     StringUtils.format("$T s=getInstance().get%s(%s, defVal)",
-                            params.getValueName(), keyStatement), mStringTypeName, params.getCurrentClass());
+                            params.getValueName(), paramsData.getKeyStatement()), mStringTypeName, params.getCurrentClass());
             if (methodInfo.getParamsNum() == 1) {
                 codeGetBuilder.addStatement(StringUtils.format("return $T.%s(s)",
                         methodInfo.getName()), methodInfo.getClassName());
             } else if (methodInfo.getParamsNum() == 2) {
                 codeGetBuilder.addStatement(StringUtils.format("return $T.%s(%s, s)",
-                        methodInfo.getName(), keyStatement), methodInfo.getClassName());
+                        methodInfo.getName(), paramsData.getKeyStatement()), methodInfo.getClassName());
             } else {
                 notSupportMethod(methodInfo, 1, 2);
             }
@@ -662,104 +542,60 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(params.getTypeName())
                 .addCode(codeGetBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(params.getParamsData().getPrefixTypeName(), prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(params.getParamsData().getSuffixTypeName(), suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
         classBuilder.addMethod(methodBuilder.build());
 
         // set方法
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        methodInfo = mEncodeMethodMap.get(params.getParamsData().getCodeId());
+        methodInfo = mEncodeMethodMap.get(paramsData.getCodeId());
         if (methodInfo == null) {
             codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, value)", params.getValueName(), keyStatement), params.getCurrentClass());
+                    "getInstance().set%s(%s, value)", params.getValueName(), paramsData.getKeyStatement()), params.getCurrentClass());
         } else {
             if (methodInfo.getParamsNum() == 1) {
                 codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(value)",
                         methodInfo.getName()), mStringTypeName, methodInfo.getClassName());
             } else if (methodInfo.getParamsNum() == 2) {
                 codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(%s, value)",
-                        methodInfo.getName(), keyStatement), mStringTypeName, methodInfo.getClassName());
+                        methodInfo.getName(), paramsData.getKeyStatement()), mStringTypeName, methodInfo.getClassName());
             } else {
                 notSupportMethod(methodInfo, 1, 2);
             }
             codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, encode)", params.getValueName(), keyStatement), params.getCurrentClass());
+                    "getInstance().set%s(%s, encode)", params.getValueName(), paramsData.getKeyStatement()), params.getCurrentClass());
         }
 
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getSetMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(params.getParamsData().getPrefixTypeName(), prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(params.getParamsData().getSuffixTypeName(), suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
 
-        // remove方法
-        CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
-        codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().remove(%s)", keyStatement), params.getCurrentClass());
-
-        if (params.getParamsData().isGenerateRemove()) {
-            addRemoveMethod(classBuilder,
-                    keyStatement,
-                    params.getCurrentClass(),
-                    params.getFiledName(),
-                    params.getTypeName(),
-                    params.getParamsData().getPrefixTypeName(),
-                    params.getParamsData().getSuffixTypeName(),
-                    hasPrefix,
-                    hasSuffix,
-                    prefixTxt,
-                    suffixTxt);
+        if (paramsData.isGenerateRemove()) {
+            addRemoveMethod(classBuilder, params);
         }
 
-        if (params.getParamsData().isGenerateContains()) {
-            addContainsMethod(classBuilder,
-                    keyStatement,
-                    params.getCurrentClass(),
-                    params.getFiledName(),
-                    params.getTypeName(),
-                    params.getParamsData().getPrefixTypeName(),
-                    params.getParamsData().getSuffixTypeName(),
-                    hasPrefix,
-                    hasSuffix,
-                    prefixTxt,
-                    suffixTxt);
+        if (paramsData.isGenerateContains()) {
+            addContainsMethod(classBuilder, params);
         }
     }
 
     private void buildGenericMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
-        CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        boolean hasPrefix = params.getParamsData().getPrefixTypeName() != null
-                && params.getParamsData().getPrefixTypeName() != TypeName.VOID;
-        boolean hasSuffix = params.getParamsData().getSuffixTypeName() != null
-                && params.getParamsData().getSuffixTypeName() != TypeName.VOID;
-        String prefixTxt = "prefix";
-        String suffixTxt = "suffix";
+        PrefParamsData paramsData = params.getParamsData();
+
         MethodSpec.Builder methodBuilder;
-
-        String keyStatement;
-        if (hasPrefix && hasSuffix) {
-            keyStatement = prefixTxt + "+$T.%s+" + suffixTxt;
-        } else if (hasPrefix) {
-            keyStatement = prefixTxt + "+$T.%s";
-        } else if (hasSuffix) {
-            keyStatement = "$T.%s+" + suffixTxt;
-        } else {
-            keyStatement = "$T.%s";
-        }
-        keyStatement = StringUtils.format(keyStatement, params.getFiledName());
-
         String valueName = "String";
         MethodInfo serializerMethod = null;
         ClassName serializerClass = null;
@@ -795,9 +631,10 @@ public class ElementHandler {
         }
 
         // get方法
+        CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         codeGetBuilder.addStatement(StringUtils.format(
                 "$T json = getInstance().get%s(%s, $S)",
-                valueName, keyStatement), mStringTypeName, params.getCurrentClass(), params.getParamsData().getDefString());
+                valueName, paramsData.getKeyStatement()), mStringTypeName, params.getCurrentClass(), paramsData.getDefString());
         if (params.getValTypeName() == null) {
             if (deserializerMethod.getParamsNum() == 2) {
                 codeGetBuilder.addStatement(StringUtils.format(
@@ -806,7 +643,7 @@ public class ElementHandler {
             } else if (deserializerMethod.getParamsNum() == 3) {
                 codeGetBuilder.addStatement(StringUtils.format(
                         "$T value = $T.%s(%s,json,$T.class)",
-                        deserializerName, keyStatement), params.getTypeName(), deserializerClass,
+                        deserializerName, paramsData.getKeyStatement()), params.getTypeName(), deserializerClass,
                         params.getCurrentClass(), params.getKeyTypeName());
             } else {
                 notSupportMethod(serializerMethod, 2, 3);
@@ -819,15 +656,15 @@ public class ElementHandler {
             } else if (deserializerMethod.getParamsNum() == 4) {
                 codeGetBuilder.addStatement(StringUtils.format(
                         "$T value = $T.%s(%s,json,$T.class,$T.class)",
-                        deserializerName, keyStatement), params.getTypeName(), deserializerClass,
+                        deserializerName, paramsData.getKeyStatement()), params.getTypeName(), deserializerClass,
                         params.getCurrentClass(), params.getKeyTypeName(), params.getValTypeName());
             } else {
                 notSupportMethod(serializerMethod, 3, 4);
             }
         }
-        if (params.getParamsData().isDefNull()) {
+        if (paramsData.isDefNull()) {
             codeGetBuilder.addStatement("return value");
-        } else if (params.getParamsData().isDefEmpty()) {
+        } else if (paramsData.isDefEmpty()) {
             codeGetBuilder.beginControlFlow("if(value==null)");
             if (params.getAnnotation() instanceof PrefsVal.List) {
                 TypeName defType = TypeName.get(ArrayList.class);
@@ -852,16 +689,16 @@ public class ElementHandler {
                     .endControlFlow();
         } else {
             codeGetBuilder.beginControlFlow("if(value==null)");
-            MethodInfo methodInfo = mUserMethodParams.get(params.getParamsData().getDefValFromId());
+            MethodInfo methodInfo = mUserMethodParams.get(paramsData.getDefValFromId());
             if (methodInfo == null) {
-                canNotFindDefVal(params.getParamsData().getDefValFromId());
+                canNotFindDefVal(paramsData.getDefValFromId());
             } else if (methodInfo.isMethod()) {
                 if (methodInfo.getParamsNum() == 0) {
                     codeGetBuilder.addStatement(StringUtils.format(
                             "return $T.%s()", methodInfo.getName()), methodInfo.getClassName());
                 } else if (methodInfo.getParamsNum() == 1) {
                     codeGetBuilder.addStatement(StringUtils.format(
-                            "return $T.%s(%s)", methodInfo.getName(), keyStatement),
+                            "return $T.%s(%s)", methodInfo.getName(), paramsData.getKeyStatement()),
                             methodInfo.getClassName(), params.getCurrentClass());
                 } else {
                     notSupportMethod(serializerMethod, 0, 1);
@@ -880,22 +717,23 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(params.getTypeName())
                 .addCode(codeGetBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(params.getParamsData().getPrefixTypeName(), prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(params.getParamsData().getSuffixTypeName(), suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
         classBuilder.addMethod(methodBuilder.build());
 
         // set方法
+        CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
         if (serializerMethod.getParamsNum() == 1) {
             codeSetBuilder.addStatement(StringUtils.format("getInstance().set%s(%s, $T.%s(value))",
-                    valueName, keyStatement, serializerName), params.getCurrentClass(), serializerClass);
+                    valueName, paramsData.getKeyStatement(), serializerName), params.getCurrentClass(), serializerClass);
         } else if (serializerMethod.getParamsNum() == 2) {
             codeSetBuilder.addStatement(StringUtils.format(
                     "getInstance().set%s(%s, $T.%s(%s,value))",
-                    valueName, keyStatement, serializerName, keyStatement),
+                    valueName, paramsData.getKeyStatement(), serializerName, paramsData.getKeyStatement()),
                     params.getCurrentClass(), serializerClass, params.getCurrentClass());
         } else {
             notSupportMethod(serializerMethod, 1, 2);
@@ -905,101 +743,65 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(params.getParamsData().getPrefixTypeName(), prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(params.getParamsData().getSuffixTypeName(), suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
 
-        if (params.getParamsData().isGenerateRemove()) {
-            addRemoveMethod(classBuilder,
-                    keyStatement,
-                    params.getCurrentClass(),
-                    params.getFiledName(),
-                    params.getTypeName(),
-                    params.getParamsData().getPrefixTypeName(),
-                    params.getParamsData().getSuffixTypeName(),
-                    hasPrefix,
-                    hasSuffix,
-                    prefixTxt,
-                    suffixTxt);
+        if (paramsData.isGenerateRemove()) {
+            addRemoveMethod(classBuilder, params);
         }
 
-        if (params.getParamsData().isGenerateContains()) {
-            addContainsMethod(classBuilder,
-                    keyStatement,
-                    params.getCurrentClass(),
-                    params.getFiledName(),
-                    params.getTypeName(),
-                    params.getParamsData().getPrefixTypeName(),
-                    params.getParamsData().getSuffixTypeName(),
-                    hasPrefix,
-                    hasSuffix,
-                    prefixTxt,
-                    suffixTxt);
+        if (paramsData.isGenerateContains()) {
+            addContainsMethod(classBuilder, params);
         }
     }
 
-    private void addRemoveMethod(TypeSpec.Builder classBuilder,
-                                 String keyStatement,
-                                 ClassName currentClass,
-                                 String filedName,
-                                 TypeName typeName,
-                                 TypeName prefixTypeName,
-                                 TypeName suffixTypeName,
-                                 boolean hasPrefix,
-                                 boolean hasSuffix,
-                                 String prefixTxt,
-                                 String suffixTxt) {
+    private void addRemoveMethod(TypeSpec.Builder classBuilder, KeyParams params) {
+        PrefParamsData paramsData = params.getParamsData();
+
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().remove(%s)", keyStatement), currentClass);
+                "return getInstance().remove(%s)", paramsData.getKeyStatement()), params.getCurrentClass());
 
         MethodSpec.Builder methodBuilder;
-        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getRemoveMethodName(filedName))
+        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getRemoveMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
-        methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
+        methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
     }
 
-    private void addContainsMethod(TypeSpec.Builder classBuilder,
-                                   String keyStatement,
-                                   ClassName currentClass,
-                                   String filedName,
-                                   TypeName typeName,
-                                   TypeName prefixTypeName,
-                                   TypeName suffixTypeName,
-                                   boolean hasPrefix,
-                                   boolean hasSuffix,
-                                   String prefixTxt,
-                                   String suffixTxt) {
+    private void addContainsMethod(TypeSpec.Builder classBuilder, KeyParams params) {
+        PrefParamsData paramsData = params.getParamsData();
+
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().contains(%s)", keyStatement), currentClass);
+                "return getInstance().contains(%s)", paramsData.getKeyStatement()), params.getCurrentClass());
 
         MethodSpec.Builder methodBuilder;
-        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getContainsMethodName(filedName))
+        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getContainsMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
-        if (hasPrefix) {
-            methodBuilder.addParameter(prefixTypeName, prefixTxt, Modifier.FINAL);
+        if (paramsData.isHasPrefix()) {
+            methodBuilder.addParameter(paramsData.getPrefixTypeName(), paramsData.getPrefixParamName(), Modifier.FINAL);
         }
-        if (hasSuffix) {
-            methodBuilder.addParameter(suffixTypeName, suffixTxt, Modifier.FINAL);
+        if (paramsData.isHasSuffix()) {
+            methodBuilder.addParameter(paramsData.getSuffixTypeName(), paramsData.getSuffixParamName(), Modifier.FINAL);
         }
-        methodBuilder.addParameter(typeName, "value", Modifier.FINAL);
+        methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
     }
 
