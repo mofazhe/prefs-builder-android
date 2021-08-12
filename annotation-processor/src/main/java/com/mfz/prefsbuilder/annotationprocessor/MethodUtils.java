@@ -1,5 +1,6 @@
 package com.mfz.prefsbuilder.annotationprocessor;
 
+import com.mfz.prefsbuilder.PrefKeyHeadTail;
 import com.squareup.javapoet.TypeName;
 
 import java.util.Locale;
@@ -55,12 +56,12 @@ public class MethodUtils {
         return transformerClass(element, "valType", clazz, elements);
     }
 
-    public static TypeName getPrefixType(Element element, Class<?> clazz, Elements elements) {
-        return transformerClass(element, "prefixType", clazz, elements);
+    public static TypeName getPrefixType(Element element, Elements elements) {
+        return transformerClass(element, "prefixType", PrefKeyHeadTail.class, elements);
     }
 
-    public static TypeName getSuffixType(Element element, Class<?> clazz, Elements elements) {
-        return transformerClass(element, "suffixType", clazz, elements);
+    public static TypeName getSuffixType(Element element, Elements elements) {
+        return transformerClass(element, "suffixType", PrefKeyHeadTail.class, elements);
     }
 
     public static TypeName transformerClass(Element element, String key, Class<?> clazz, Elements elements) {

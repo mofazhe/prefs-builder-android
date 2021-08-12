@@ -1,5 +1,6 @@
-package com.mfz.prefsbuilder.annotationprocessor;
+package com.mfz.prefsbuilder.annotationprocessor.data;
 
+import com.mfz.prefsbuilder.annotationprocessor.StringUtils;
 import com.squareup.javapoet.TypeName;
 
 /**
@@ -8,7 +9,7 @@ import com.squareup.javapoet.TypeName;
  * @date 2021/07/14/周三
  * @time 17:35
  */
-public class PrefParamsData {
+public class AnnotationParams {
     private boolean mDefNull;
     private int mDefValFromId;
     private boolean mDefEmpty;
@@ -24,7 +25,7 @@ public class PrefParamsData {
     private String mSuffixParamName;
     private String mKeyStatement;
 
-    private PrefParamsData(Builder builder) {
+    private AnnotationParams(Builder builder) {
         setDefNull(builder.mDefNull);
         setDefValFromId(builder.mDefValFromId);
         setDefEmpty(builder.mDefEmpty);
@@ -279,7 +280,7 @@ public class PrefParamsData {
             return this;
         }
 
-        public PrefParamsData build(KeyParams params) {
+        public AnnotationParams build(KeyParams params) {
             boolean hasPrefix = mPrefixTypeName != null
                     && mPrefixTypeName != TypeName.VOID;
             boolean hasSuffix = mSuffixTypeName != null
@@ -296,7 +297,7 @@ public class PrefParamsData {
                 keyStatement = "$T.%s";
             }
             keyStatement = StringUtils.format(keyStatement, params.getFiledName());
-            return new PrefParamsData(hasPrefix(hasPrefix)
+            return new AnnotationParams(hasPrefix(hasPrefix)
                     .hasSuffix(hasSuffix)
                     .keyStatement(keyStatement));
         }

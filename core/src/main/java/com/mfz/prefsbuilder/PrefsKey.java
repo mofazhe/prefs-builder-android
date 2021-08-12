@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  * @date 2020 /05/14/Thu
  * @time 14 :56
  */
-public class PrefsVal {
+public class PrefsKey {
 
     /**
      * int类型

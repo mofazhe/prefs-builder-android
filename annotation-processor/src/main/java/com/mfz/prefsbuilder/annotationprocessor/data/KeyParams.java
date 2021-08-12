@@ -1,4 +1,4 @@
-package com.mfz.prefsbuilder.annotationprocessor;
+package com.mfz.prefsbuilder.annotationprocessor.data;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -17,7 +17,7 @@ public class KeyParams {
     private Object mDefValue;
     private ClassName mCurrentClass;
     private TypeName mTypeName;
-    private PrefParamsData mParamsData;
+    private AnnotationParams mAnnotationParams;
     private Annotation mAnnotation;
     private TypeName mKeyTypeName;
     private TypeName mValTypeName;
@@ -29,7 +29,7 @@ public class KeyParams {
         setDefValue(builder.mDefValue);
         setCurrentClass(builder.mCurrentClass);
         setTypeName(builder.mTypeName);
-        setParamsData(builder.mParamsData);
+        setAnnotationParams(builder.mAnnotationParams);
         setAnnotation(builder.mAnnotation);
         setKeyTypeName(builder.mKeyTypeName);
         setValTypeName(builder.mValTypeName);
@@ -80,12 +80,12 @@ public class KeyParams {
         mTypeName = typeName;
     }
 
-    public PrefParamsData getParamsData() {
-        return mParamsData;
+    public AnnotationParams getAnnotationParams() {
+        return mAnnotationParams;
     }
 
-    public void setParamsData(PrefParamsData paramsData) {
-        mParamsData = paramsData;
+    public void setAnnotationParams(AnnotationParams annotationParams) {
+        mAnnotationParams = annotationParams;
     }
 
     public Annotation getAnnotation() {
@@ -127,7 +127,7 @@ public class KeyParams {
         builder.mDefValue = getDefValue();
         builder.mCurrentClass = getCurrentClass();
         builder.mTypeName = getTypeName();
-        builder.mParamsData = getParamsData();
+        builder.mAnnotationParams = getAnnotationParams();
         builder.mAnnotation = getAnnotation();
         builder.mKeyTypeName = getKeyTypeName();
         builder.mValTypeName = getValTypeName();
@@ -141,7 +141,7 @@ public class KeyParams {
         private Object mDefValue;
         private ClassName mCurrentClass;
         private TypeName mTypeName;
-        private PrefParamsData mParamsData;
+        private AnnotationParams mAnnotationParams;
         private Annotation mAnnotation;
         private TypeName mKeyTypeName;
         private TypeName mValTypeName;
@@ -175,8 +175,8 @@ public class KeyParams {
             return this;
         }
 
-        public Builder paramsData(PrefParamsData val) {
-            mParamsData = val;
+        public Builder annotationParams(AnnotationParams val) {
+            mAnnotationParams = val;
             return this;
         }
 

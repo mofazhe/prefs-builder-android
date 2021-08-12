@@ -19,7 +19,7 @@ public class StringCodec {
     @Target(ElementType.METHOD)
     public @interface Decode {
         /**
-         * 根据该id调用方法与{@link PrefsVal.String#codecId()}对应
+         * 根据该id调用方法与{@link PrefsKey.String#codecId()}对应
          * 该id可以与{@link DefaultValue}重复
          * 注意1：该id应该与{@link Encode}成对出现，否则编码会出现问题
          * 注意2：仅限使用大于0的值
@@ -36,7 +36,7 @@ public class StringCodec {
     @Target(ElementType.METHOD)
     public @interface Encode {
         /**
-         * 根据该id调用方法与{@link PrefsVal.String#codecId()}对应
+         * 根据该id调用方法与{@link PrefsKey.String#codecId()}对应
          * 该id可以与{@link DefaultValue}重复
          * 注意1：该id应该与{@link Decode}成对出现，否则解码会出现问题
          * 注意2：仅限使用大于0的值

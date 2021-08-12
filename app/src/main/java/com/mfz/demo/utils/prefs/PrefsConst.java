@@ -1,7 +1,7 @@
 package com.mfz.demo.utils.prefs;
 
 import com.mfz.prefsbuilder.PrefsClass;
-import com.mfz.prefsbuilder.PrefsVal;
+import com.mfz.prefsbuilder.PrefsKey;
 
 /**
  * @author mz
@@ -11,7 +11,7 @@ import com.mfz.prefsbuilder.PrefsVal;
 public class PrefsConst {
     @PrefsClass(currentPkg = true)
     public static class Test {
-        @PrefsVal.String()
+        @PrefsKey.String()
         public static String SHOW_EDIT_TEXT_BUTTON = "a";
     }
 }

@@ -3,9 +3,12 @@ package com.mfz.demo.utils;
 import android.util.SparseArray;
 
 import com.mfz.prefsbuilder.DefaultValue;
+import com.mfz.prefsbuilder.PrefDefVal;
+import com.mfz.prefsbuilder.PrefGenerateCtrl;
+import com.mfz.prefsbuilder.PrefKeyHeadTail;
 import com.mfz.prefsbuilder.PrefParams;
 import com.mfz.prefsbuilder.PrefsClass;
-import com.mfz.prefsbuilder.PrefsVal;
+import com.mfz.prefsbuilder.PrefsKey;
 
 import java.util.Collections;
 import java.util.Deque;
@@ -26,95 +29,107 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class PrefsConst {
     @PrefsClass()
     public static class User {
-        @PrefsVal.Int()
+        @PrefsKey.Int()
         public static final String TEST_INT = "null";
 
-        @PrefsVal.String()
-        @PrefParams(defNull = true)
+        @PrefsKey.String()
+        @PrefDefVal(defNull = true)
         public static final String TEST_STRING = "b";
 
-        @PrefsVal.String(defVal = "111")
-        @PrefParams(defNull = false)
+        @PrefsKey.String(defVal = "111")
+        @PrefDefVal(defNull = false)
+        @PrefGenerateCtrl()
         public static final String TEST_STRING_NOT = "b";
 
-        @PrefsVal.Byte()
+        @PrefsKey.Byte()
+        @PrefGenerateCtrl(generateContains = false)
         public static final String TEST_BYTE = "c";
     }
 
-    @PrefsVal.Int(defVal = 122)
-    @PrefParams(defValFromId = 123)
+    @PrefsKey.Int(defVal = 122)
+    @PrefDefVal(defValFromId = 123)
+    @PrefGenerateCtrl(generateRemove = false)
     public static final String TEST_INT = "a";
 
-    @PrefsVal.Float(defVal = 1.233300f)
-    @PrefParams(defValFromId = 133)
+    @PrefsKey.Float(defVal = 1.233300f)
+    @PrefDefVal(defValFromId = 133)
     public static final String TEST_FLOAT = "float";
 
-    @PrefsVal.Bool(defVal = true)
-    @PrefParams(defValFromId = 144)
+    @PrefsKey.Bool(defVal = true)
+    @PrefDefVal(defValFromId = 144)
+    @PrefGenerateCtrl(generateRemove = false, generateContains = false)
     public static final String TEST_BOOL = "a";
 
-    @PrefsVal.Bool(defVal = true)
+    @PrefsKey.Bool(defVal = true)
     @PrefParams()
     public static final String IS_TEST_IS_BOOL = "a";
 
-    @PrefsVal.Byte(defVal = 12)
-    @PrefParams(defValFromId = 155)
+    @PrefsKey.Byte(defVal = 12)
+    @PrefDefVal(defValFromId = 155)
     public static final String TEST_BYTE = "a";
 
-    @PrefsVal.Double(defVal = 102.2435235)
-    @PrefParams(defValFromId = 166)
+    @PrefsKey.Double(defVal = 102.2435235)
+    @PrefDefVal(defValFromId = 166)
     public static final String TEST_DOUBLE = "a";
 
-    @PrefsVal.Char(defVal = 's')
-    @PrefParams(defValFromId = 177, prefixType = byte.class)
+    @PrefsKey.Char(defVal = 's')
+    @PrefDefVal(defValFromId = 177)
+    @PrefKeyHeadTail(prefixType = byte.class)
     public static final String TEST_CHAR = "a";
 
-    @PrefsVal.Short(defVal = 234)
-    @PrefParams(defValFromId = 188)
+    @PrefsKey.Short(defVal = 234)
+    @PrefDefVal(defValFromId = 188)
+    @PrefParams(codecId = 1)
     public static final String TEST_SHORT = "a";
 
-    @PrefsVal.String()
-    @PrefParams(defValFromId = 111, prefixType = float.class, suffixType = double.class)
+    @PrefsKey.String()
+    @PrefDefVal(defValFromId = 111)
+    @PrefKeyHeadTail(prefixType = float.class, suffixType = double.class)
     public static final String TEST_STRING = "b";
 
-    @PrefsVal.String(defVal = "[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]")
-    @PrefParams()
+    @PrefsKey.String(defVal = "[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]")
+    @PrefDefVal()
     public static final String TEST_STRING_JSON = "b";
 
-    @PrefsVal.String()
-    @PrefParams(defNull = true, prefixType = String.class, suffixType = int.class, codecId = 1)
+    @PrefsKey.String()
+    @PrefDefVal(defNull = true)
+    @PrefParams(codecId = 1)
+    @PrefKeyHeadTail(prefixType = String.class, suffixType = int.class)
     public static final String TEST_STRING_BASE64 = "b";
 
-    @PrefsVal.Object(type = Test.class)
-    @PrefParams(defValFromId = 1, defNull = true)
+    @PrefsKey.Object(type = Test.class)
+    @PrefDefVal(defValFromId = 1, defNull = true)
     public static final String TEST_OBJECT = "c";
 
-    @PrefsVal.List(type = Test.class)
-    @PrefParams(defEmpty = false, defValFromId = 2, defString = "[]")
+    @PrefsKey.List(type = Test.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 2, defString = "[]")
     public static final String TEST_LIST = "d";
 
-    @PrefsVal.List(type = Test.class)
-    @PrefParams()
+    @PrefsKey.List(type = Test.class)
+    @PrefDefVal()
     public static final String TEST_LIST_EMPTY = "d";
 
-    @PrefsVal.Set(type = Test.class)
-    @PrefParams(defEmpty = false, defValFromId = 3)
+    @PrefsKey.Set(type = Test.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 3)
     public static final String TEST_SET = "e";
 
-    @PrefsVal.Queue(type = String.class)
-    @PrefParams(defEmpty = false, defValFromId = 4, suffixType = String.class)
+    @PrefsKey.Queue(type = String.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 4)
+    @PrefKeyHeadTail(suffixType = String.class)
     public static final String TEST_QUEUE = "f";
 
-    @PrefsVal.Deque(type = Test.class)
-    @PrefParams(defEmpty = false, defValFromId = 5, prefixType = int.class)
+    @PrefsKey.Deque(type = Test.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 5)
+    @PrefKeyHeadTail(prefixType = int.class)
     public static final String TEST_DEQUE = "g";
 
-    @PrefsVal.SparseArray(type = String.class)
-    @PrefParams(defEmpty = false, defValFromId = 7, prefixType = int.class)
+    @PrefsKey.SparseArray(type = String.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 7)
+    @PrefKeyHeadTail(prefixType = int.class)
     public static final String TEST_SPARSE_ARRAY = "g";
 
-    @PrefsVal.Map(keyType = String.class, valType = Test.class)
-    @PrefParams(defEmpty = false, defValFromId = 6)
+    @PrefsKey.Map(keyType = String.class, valType = Test.class)
+    @PrefDefVal(defEmpty = false, defValFromId = 6)
     public static final String TEST_MAP = "h";
 
     @DefaultValue(id = 123)

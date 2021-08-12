@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.mfz.prefsbuilder.Deserializer;
-import com.mfz.prefsbuilder.PrefsVal;
+import com.mfz.prefsbuilder.PrefsKey;
 import com.mfz.prefsbuilder.Serializer;
 
 /**
@@ -20,22 +20,22 @@ import com.mfz.prefsbuilder.Serializer;
 public class AnnotationList {
     public static Set<Class<? extends Annotation>> getPrefsVal() {
         Set<Class<? extends Annotation>> set = new HashSet<>(50);
-        set.add(PrefsVal.Int.class);
-        set.add(PrefsVal.Float.class);
-        set.add(PrefsVal.Bool.class);
-        set.add(PrefsVal.Byte.class);
-        set.add(PrefsVal.Double.class);
-        set.add(PrefsVal.Char.class);
-        set.add(PrefsVal.Long.class);
-        set.add(PrefsVal.Short.class);
-        set.add(PrefsVal.String.class);
-        set.add(PrefsVal.Object.class);
-        set.add(PrefsVal.List.class);
-        set.add(PrefsVal.Set.class);
-        set.add(PrefsVal.Queue.class);
-        set.add(PrefsVal.Deque.class);
-        set.add(PrefsVal.SparseArray.class);
-        set.add(PrefsVal.Map.class);
+        set.add(PrefsKey.Int.class);
+        set.add(PrefsKey.Float.class);
+        set.add(PrefsKey.Bool.class);
+        set.add(PrefsKey.Byte.class);
+        set.add(PrefsKey.Double.class);
+        set.add(PrefsKey.Char.class);
+        set.add(PrefsKey.Long.class);
+        set.add(PrefsKey.Short.class);
+        set.add(PrefsKey.String.class);
+        set.add(PrefsKey.Object.class);
+        set.add(PrefsKey.List.class);
+        set.add(PrefsKey.Set.class);
+        set.add(PrefsKey.Queue.class);
+        set.add(PrefsKey.Deque.class);
+        set.add(PrefsKey.SparseArray.class);
+        set.add(PrefsKey.Map.class);
         return set;
     }
 
@@ -63,39 +63,39 @@ public class AnnotationList {
         List<Integer> list;
         Map<Class<? extends Annotation>, List<Integer>> map = new HashMap<>(20);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(1);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.Object.class, list);
+        map.put(PrefsKey.Object.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.LIST);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.List.class, list);
+        map.put(PrefsKey.List.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.SET);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.Set.class, list);
+        map.put(PrefsKey.Set.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.QUEUE);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.Queue.class, list);
+        map.put(PrefsKey.Queue.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.DEQUE);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.Deque.class, list);
+        map.put(PrefsKey.Deque.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.SPARSE_ARRAY);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.SparseArray.class, list);
+        map.put(PrefsKey.SparseArray.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Deserializer.MAP);
         list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsVal.Map.class, list);
+        map.put(PrefsKey.Map.class, list);
 
         return map;
     }
@@ -104,39 +104,39 @@ public class AnnotationList {
         List<Integer> list;
         Map<Class<? extends Annotation>, List<Integer>> map = new HashMap<>(20);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.Object.class, list);
+        map.put(PrefsKey.Object.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.LIST);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.List.class, list);
+        map.put(PrefsKey.List.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.SET);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.Set.class, list);
+        map.put(PrefsKey.Set.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.QUEUE);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.Queue.class, list);
+        map.put(PrefsKey.Queue.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.DEQUE);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.Deque.class, list);
+        map.put(PrefsKey.Deque.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.SPARSE_ARRAY);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.SparseArray.class, list);
+        map.put(PrefsKey.SparseArray.class, list);
 
-        list = new ArrayList<>(5);
+        list = new ArrayList<>(2);
         list.add(Const.Key.Serializer.MAP);
         list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsVal.Map.class, list);
+        map.put(PrefsKey.Map.class, list);
 
         return map;
     }
