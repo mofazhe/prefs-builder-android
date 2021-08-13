@@ -53,8 +53,13 @@ dependencies {
 
     // Gson: https://github.com/google/gson
     implementation 'com.google.code.gson:gson:2.8.6'
+
     // Tray：https://github.com/grandcentrix/tray
     implementation 'net.grandcentrix.tray:tray:0.12.0'
+
     // 快速生成泛型：https://github.com/ikidou/TypeBuilder
     implementation 'com.github.ikidou:TypeBuilder:1.0'
+
+    // 编解码器: https://github.com/apache/commons-codec
+    implementation 'commons-codec:commons-codec:1.15'
 }

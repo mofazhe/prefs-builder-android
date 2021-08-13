@@ -51,7 +51,7 @@ import javax.lang.model.util.Elements;
 public class ElementHandler {
     private final Filer mFiler;
     private final Elements mElementUtils;
-    private final Map<String, List<Element>> classMap = new HashMap<>();
+    private final Map<String, List<Element>> mClassElementMap = new HashMap<>();
     private final Map<Integer, MethodInfo> mDefaultMethodMap = new HashMap<>();
     private final Map<Class<? extends Annotation>, MethodInfo> mRuleMethodMap = new HashMap<>();
     private final Map<String, PrefsClassInfo> mPrefsClassInfoMap = new HashMap<>();
@@ -69,7 +69,12 @@ public class ElementHandler {
     }
 
     public void clean() {
-        classMap.clear();
+        mClassElementMap.clear();
+        mDefaultMethodMap.clear();
+        mRuleMethodMap.clear();
+        mPrefsClassInfoMap.clear();
+        mDecodeMethodMap.clear();
+        mEncodeMethodMap.clear();
     }
 
     public void handleBasePrefs(RoundEnvironment roundEnv) {
@@ -184,26 +189,7 @@ public class ElementHandler {
                 if (element.getKind() != ElementKind.METHOD) {
                     continue;
                 }
-                TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-                String qualifiedName = enclosingElement.getQualifiedName().toString();
-
-                ClassName className = ClassName.bestGuess(qualifiedName);
-                ExecutableElement executableElement = (ExecutableElement) element;
-                int size = executableElement.getParameters().size();
-                // 序列化
-                // if (size > 2 || size < 1) {
-                //     continue;
-                // }
-                // 反序列化
-                // if (size > 3 || size < 2) {
-                //     return;
-                // }
-                MethodInfo params = MethodInfo.newBuilder()
-                        .isMethod(true)
-                        .name(executableElement.getSimpleName().toString())
-                        .className(className)
-                        .paramsNum(size)
-                        .build();
+                MethodInfo params = getMethodInfo(element);
                 mRuleMethodMap.put(cls, params);
                 break;
             }
@@ -211,66 +197,66 @@ public class ElementHandler {
     }
 
     public void handleCodecMethod(RoundEnvironment roundEnv) {
-        List<Class<? extends Annotation>> classes = new ArrayList<>();
-        classes.add(StringCodec.Decode.class);
-        classes.add(StringCodec.Encode.class);
-        for (Class<? extends Annotation> cls : classes) {
-            Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(cls);
-            for (Element element : aimElements) {
-                TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-                String qualifiedName = enclosingElement.getQualifiedName().toString();
+        Set<? extends Element> aimElements;
 
-                ClassName className = ClassName.bestGuess(qualifiedName);
-                if (element.getKind() == ElementKind.METHOD) {
-                    ExecutableElement executableElement = (ExecutableElement) element;
-                    int size = executableElement.getParameters().size();
-                    MethodInfo params = MethodInfo.newBuilder()
-                            .isMethod(true)
-                            .name(executableElement.getSimpleName().toString())
-                            .className(className)
-                            .paramsNum(size)
-                            .build();
-                    int id;
-                    Annotation annotation = element.getAnnotation(cls);
-                    if (annotation instanceof StringCodec.Encode) {
-                        id = ((StringCodec.Encode) annotation).id();
-                        mEncodeMethodMap.put(id, params);
-                    } else {
-                        id = ((StringCodec.Decode) annotation).id();
-                        mDecodeMethodMap.put(id, params);
-                    }
-                    break;
-                }
+        aimElements = roundEnv.getElementsAnnotatedWith(StringCodec.Decode.class);
+        for (Element element : aimElements) {
+            if (element.getKind() != ElementKind.METHOD) {
+                continue;
             }
+            MethodInfo params = getMethodInfo(element);
+            StringCodec.Decode annotation = element.getAnnotation(StringCodec.Decode.class);
+            mDecodeMethodMap.put(annotation.id(), params);
         }
+
+        aimElements = roundEnv.getElementsAnnotatedWith(StringCodec.Encode.class);
+        for (Element element : aimElements) {
+            if (element.getKind() != ElementKind.METHOD) {
+                continue;
+            }
+            MethodInfo params = getMethodInfo(element);
+            StringCodec.Encode annotation = element.getAnnotation(StringCodec.Encode.class);
+            mEncodeMethodMap.put(annotation.id(), params);
+        }
+    }
+
+    private MethodInfo getMethodInfo(Element element) {
+        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+        String qualifiedName = enclosingElement.getQualifiedName().toString();
+
+        ClassName className = ClassName.bestGuess(qualifiedName);
+        ExecutableElement executableElement = (ExecutableElement) element;
+        int size = executableElement.getParameters().size();
+        return MethodInfo.newBuilder()
+                .isMethod(true)
+                .name(executableElement.getSimpleName().toString())
+                .className(className)
+                .paramsNum(size)
+                .build();
     }
 
     public void handlePrefsVal(RoundEnvironment roundEnv, Class<? extends Annotation> annotation) {
         Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(annotation);
         for (Element element : aimElements) {
-            handleElement(element);
+            if (element.getKind() != ElementKind.FIELD) {
+                return;
+            }
+            TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+            String fullClassName = enclosingElement.getQualifiedName().toString();
+            List<Element> elementList = mClassElementMap.get(fullClassName);
+            if (elementList == null) {
+                elementList = new ArrayList<>();
+                mClassElementMap.put(fullClassName, elementList);
+            }
+            elementList.add(element);
         }
-    }
-
-    private void handleElement(Element element) {
-        if (element.getKind() != ElementKind.FIELD) {
-            return;
-        }
-        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String fullClassName = enclosingElement.getQualifiedName().toString();
-        List<Element> elementList = classMap.get(fullClassName);
-        if (elementList == null) {
-            elementList = new ArrayList<>();
-            classMap.put(fullClassName, elementList);
-        }
-        elementList.add(element);
     }
 
     public void createJavaFiles() {
         if (mBasePrefsClassname == null) {
             throw new NullPointerException("Base prefs class is null! Please implement BasePrefsInterface!");
         }
-        Set<Map.Entry<String, List<Element>>> entrySet = classMap.entrySet();
+        Set<Map.Entry<String, List<Element>>> entrySet = mClassElementMap.entrySet();
         for (Map.Entry<String, List<Element>> entry : entrySet) {
             createPrefs(entry.getKey(), entry.getValue());
         }

@@ -1,5 +1,6 @@
 package com.mfz.demo.utils.prefs;
 
+import com.mfz.prefsbuilder.PrefParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 
@@ -12,6 +13,10 @@ public class PrefsConst {
     @PrefsClass(currentPkg = true)
     public static class Test {
         @PrefsKey.String()
-        public static String SHOW_EDIT_TEXT_BUTTON = "a";
+        public static String SHOW_EDIT_TEXT_BUTTON = "b";
+
+        @PrefsKey.String()
+        @PrefParams(codecId = 2)
+        public static String SETTING_A = "a";
     }
 }
