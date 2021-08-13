@@ -2,6 +2,7 @@ package com.mfz.prefsbuilder.annotationprocessor;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +19,8 @@ import com.mfz.prefsbuilder.Serializer;
  * @time 15:20
  */
 public class AnnotationList {
-    public static Set<Class<? extends Annotation>> getPrefsVal() {
-        Set<Class<? extends Annotation>> set = new HashSet<>(50);
+    public static List<Class<? extends Annotation>> getPrefsKeyList() {
+        List<Class<? extends Annotation>> set = new ArrayList<>(50);
         set.add(PrefsKey.Int.class);
         set.add(PrefsKey.Float.class);
         set.add(PrefsKey.Bool.class);
@@ -39,105 +40,61 @@ public class AnnotationList {
         return set;
     }
 
-    public static Map<Class<? extends Annotation>, Integer> getRuleMethod() {
-        Map<Class<? extends Annotation>, Integer> map = new HashMap<>(100);
-        map.put(Serializer.Object.class, Const.Key.Serializer.OBJ);
-        map.put(Serializer.List.class, Const.Key.Serializer.LIST);
-        map.put(Serializer.Set.class, Const.Key.Serializer.SET);
-        map.put(Serializer.Queue.class, Const.Key.Serializer.QUEUE);
-        map.put(Serializer.Deque.class, Const.Key.Serializer.DEQUE);
-        map.put(Serializer.SparseArray.class, Const.Key.Serializer.SPARSE_ARRAY);
-        map.put(Serializer.Map.class, Const.Key.Serializer.MAP);
+    public static List<Class<? extends Annotation>> getRuleMethodList() {
+        List<Class<? extends Annotation>> map = new ArrayList<>(100);
+        map.add(Serializer.Object.class);
+        map.add(Serializer.List.class);
+        map.add(Serializer.Set.class);
+        map.add(Serializer.Queue.class);
+        map.add(Serializer.Deque.class);
+        map.add(Serializer.SparseArray.class);
+        map.add(Serializer.Map.class);
 
-        map.put(Deserializer.Object.class, Const.Key.Deserializer.OBJ);
-        map.put(Deserializer.List.class, Const.Key.Deserializer.LIST);
-        map.put(Deserializer.Set.class, Const.Key.Deserializer.SET);
-        map.put(Deserializer.Queue.class, Const.Key.Deserializer.QUEUE);
-        map.put(Deserializer.Deque.class, Const.Key.Deserializer.DEQUE);
-        map.put(Deserializer.SparseArray.class, Const.Key.Deserializer.SPARSE_ARRAY);
-        map.put(Deserializer.Map.class, Const.Key.Deserializer.MAP);
+        map.add(Deserializer.Object.class);
+        map.add(Deserializer.List.class);
+        map.add(Deserializer.Set.class);
+        map.add(Deserializer.Queue.class);
+        map.add(Deserializer.Deque.class);
+        map.add(Deserializer.SparseArray.class);
+        map.add(Deserializer.Map.class);
         return map;
     }
 
-    public static Map<Class<? extends Annotation>, List<Integer>> getDeserializerByVal() {
-        List<Integer> list;
-        Map<Class<? extends Annotation>, List<Integer>> map = new HashMap<>(20);
-
-        list = new ArrayList<>(1);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.Object.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.LIST);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.List.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.SET);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.Set.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.QUEUE);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.Queue.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.DEQUE);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.Deque.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.SPARSE_ARRAY);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.SparseArray.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Deserializer.MAP);
-        list.add(Const.Key.Deserializer.OBJ);
-        map.put(PrefsKey.Map.class, list);
-
-        return map;
+    public static List<Class<? extends Annotation>> getDeserializerList(Class<? extends Annotation> cls) {
+        List<Class<? extends Annotation>> list = new ArrayList<>();
+        if (cls == PrefsKey.List.class) {
+            list.add(Deserializer.List.class);
+        } else if (cls == PrefsKey.Set.class) {
+            list.add(Deserializer.Set.class);
+        } else if (cls == PrefsKey.Queue.class) {
+            list.add(Deserializer.Queue.class);
+        } else if (cls == PrefsKey.Deque.class) {
+            list.add(Deserializer.Deque.class);
+        } else if (cls == PrefsKey.SparseArray.class) {
+            list.add(Deserializer.SparseArray.class);
+        } else if (cls == PrefsKey.Map.class) {
+            list.add(Deserializer.Map.class);
+        }
+        list.add(Deserializer.Object.class);
+        return list;
     }
 
-    public static Map<Class<? extends Annotation>, List<Integer>> getSerializerByVal() {
-        List<Integer> list;
-        Map<Class<? extends Annotation>, List<Integer>> map = new HashMap<>(20);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.Object.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.LIST);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.List.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.SET);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.Set.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.QUEUE);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.Queue.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.DEQUE);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.Deque.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.SPARSE_ARRAY);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.SparseArray.class, list);
-
-        list = new ArrayList<>(2);
-        list.add(Const.Key.Serializer.MAP);
-        list.add(Const.Key.Serializer.OBJ);
-        map.put(PrefsKey.Map.class, list);
-
-        return map;
+    public static List<Class<? extends Annotation>> getSerializerList(Class<? extends Annotation> cls) {
+        List<Class<? extends Annotation>> list = new ArrayList<>();
+        if (cls == PrefsKey.List.class) {
+            list.add(Serializer.List.class);
+        } else if (cls == PrefsKey.Set.class) {
+            list.add(Serializer.Set.class);
+        } else if (cls == PrefsKey.Queue.class) {
+            list.add(Serializer.Queue.class);
+        } else if (cls == PrefsKey.Deque.class) {
+            list.add(Serializer.Deque.class);
+        } else if (cls == PrefsKey.SparseArray.class) {
+            list.add(Serializer.SparseArray.class);
+        } else if (cls == PrefsKey.Map.class) {
+            list.add(Serializer.Map.class);
+        }
+        list.add(Serializer.Object.class);
+        return list;
     }
 }

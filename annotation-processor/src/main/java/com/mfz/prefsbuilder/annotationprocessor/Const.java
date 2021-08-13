@@ -19,27 +19,4 @@ public interface Const {
         String CLASS_SUFFIX = "";
     }
 
-    interface Key {
-        interface Serializer {
-            int OBJ = 1;
-            int LIST = 2;
-            int SET = 3;
-            int QUEUE = 4;
-            int DEQUE = 5;
-            int SPARSE_ARRAY = 6;
-            int MAP = 7;
-        }
-
-        interface Deserializer {
-            int OBJ = 51;
-            int LIST = 52;
-            int SET = 53;
-            int QUEUE = 54;
-            int DEQUE = 55;
-            int SPARSE_ARRAY = 56;
-            int MAP = 57;
-        }
-
-    }
-
 }

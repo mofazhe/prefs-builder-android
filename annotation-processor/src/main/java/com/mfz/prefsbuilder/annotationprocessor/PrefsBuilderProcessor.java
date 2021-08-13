@@ -38,11 +38,12 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
     private ElementHandler mHandler;
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnvironment) {
-        super.init(processingEnvironment);
-        PrintLog.init(processingEnvironment.getMessager());
-        mHandler = new ElementHandler(processingEnvironment.getFiler(),
-                processingEnvironment.getElementUtils());
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        PrintLog.init(processingEnv.getMessager());
+        mHandler = new ElementHandler(processingEnv.getFiler(),
+                processingEnv.getElementUtils(),
+                processingEnv);
     }
 
     @Override
@@ -53,10 +54,10 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
         annotations.add(BasePrefsClass.class.getCanonicalName());
         annotations.add(StringCodec.Decode.class.getCanonicalName());
         annotations.add(StringCodec.Encode.class.getCanonicalName());
-        for (Class<? extends Annotation> c : AnnotationList.getPrefsVal()) {
+        for (Class<? extends Annotation> c : AnnotationList.getPrefsKeyList()) {
             annotations.add(c.getCanonicalName());
         }
-        for (Class<? extends Annotation> c : AnnotationList.getRuleMethod().keySet()) {
+        for (Class<? extends Annotation> c : AnnotationList.getRuleMethodList()) {
             annotations.add(c.getCanonicalName());
         }
         annotations.add(PrefParams.class.getCanonicalName());
@@ -72,11 +73,11 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         mHandler.clean();
         mHandler.handleBasePrefs(roundEnvironment);
-        mHandler.handlePrefsClass(processingEnv, roundEnvironment);
+        mHandler.handlePrefsClass(roundEnvironment);
         mHandler.handleCodecMethod(roundEnvironment);
-        mHandler.handleDefObjectVal(roundEnvironment);
+        mHandler.handleDefaultVal(roundEnvironment);
         mHandler.handleRuleMethod(roundEnvironment);
-        for (Class<? extends Annotation> c : AnnotationList.getPrefsVal()) {
+        for (Class<? extends Annotation> c : AnnotationList.getPrefsKeyList()) {
             mHandler.handlePrefsVal(roundEnvironment, c);
         }
         mHandler.createJavaFiles();

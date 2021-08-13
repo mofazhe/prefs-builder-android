@@ -52,17 +52,19 @@ public class ElementHandler {
     private final Filer mFiler;
     private final Elements mElementUtils;
     private final Map<String, List<Element>> classMap = new HashMap<>();
-    private final Map<Integer, MethodInfo> mUserMethodParams = new HashMap<>();
-    private final Map<Integer, MethodInfo> mMethodInnerMap = new HashMap<>();
+    private final Map<Integer, MethodInfo> mDefaultMethodMap = new HashMap<>();
+    private final Map<Class<? extends Annotation>, MethodInfo> mRuleMethodMap = new HashMap<>();
     private final Map<String, PrefsClassInfo> mPrefsClassInfoMap = new HashMap<>();
     private final Map<Integer, MethodInfo> mDecodeMethodMap = new HashMap<>();
     private final Map<Integer, MethodInfo> mEncodeMethodMap = new HashMap<>();
     private final TypeName mStringTypeName;
     private ClassName mBasePrefsClassname;
+    private final ProcessingEnvironment mProcessingEnv;
 
-    public ElementHandler(Filer filer, Elements elementUtils) {
+    public ElementHandler(Filer filer, Elements elementUtils, ProcessingEnvironment processingEnv) {
         mFiler = filer;
         mElementUtils = elementUtils;
+        mProcessingEnv = processingEnv;
         mStringTypeName = TypeName.get(String.class);
     }
 
@@ -82,8 +84,8 @@ public class ElementHandler {
         }
     }
 
-    public void handlePrefsClass(ProcessingEnvironment processingEnv, RoundEnvironment roundEnv) {
-        Map<String, String> options = processingEnv.getOptions();
+    public void handlePrefsClass(RoundEnvironment roundEnv) {
+        Map<String, String> options = mProcessingEnv.getOptions();
         String defPrefsPkg = options.get(Const.OptionArg.PKG);
         if (StringUtils.isEmpty(defPrefsPkg)) {
             defPrefsPkg = Const.Default.PKG;
@@ -98,48 +100,52 @@ public class ElementHandler {
         }
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(PrefsClass.class);
         for (Element element : elements) {
-            if (element.getKind() == ElementKind.CLASS) {
-                TypeElement typeElement = (TypeElement) element;
-
-                PackageElement packageElement = mElementUtils.getPackageOf(element);
-                String currentPkgName = packageElement.getQualifiedName().toString();
-
-                PrefsClass annotation = typeElement.getAnnotation(PrefsClass.class);
-                String pkgName;
-                if (annotation.currentPkg()) {
-                    pkgName = currentPkgName;
-                } else {
-                    pkgName = StringUtils.isEmpty(annotation.pkgName()
-                            .replace(".", "")) ?
-                            defPrefsPkg : annotation.pkgName();
-                    if (pkgName.endsWith(".")) {
-                        pkgName = pkgName.substring(0, pkgName.length() - 1);
-                    }
-                }
-                String classNameVal = annotation.currentClassName() ?
-                        element.getSimpleName().toString() : annotation.className();
-                String qualifiedName = typeElement.getQualifiedName().toString();
-                if (StringUtils.isEmpty(classNameVal)) {
-                    throw new NullPointerException("New class name is empty in "
-                            + qualifiedName + "! Please specify the new class name!");
-                }
-                String className = classPrefix + classNameVal + classSuffix;
-                String fileName = StringUtils.isEmpty(annotation.fileName()) ?
-                        StringUtils.camel2SmallConst(classNameVal) : annotation.fileName();
-                ClassName keyClassName = ClassName.bestGuess(qualifiedName);
-                PrefsClassInfo prefsClassInfo = PrefsClassInfo.newBuilder()
-                        .className(ClassName.get(pkgName, className))
-                        .fileName(fileName)
-                        .keyClassName(keyClassName)
-                        .build();
-                mPrefsClassInfoMap.put(qualifiedName, prefsClassInfo);
+            if (element.getKind() != ElementKind.CLASS) {
+                continue;
             }
+            TypeElement typeElement = (TypeElement) element;
+
+            PackageElement packageElement = mElementUtils.getPackageOf(element);
+            String currentPkgName = packageElement.getQualifiedName().toString();
+
+            PrefsClass annotation = typeElement.getAnnotation(PrefsClass.class);
+            String pkgName;
+            if (annotation.currentPkg()) {
+                pkgName = currentPkgName;
+            } else {
+                pkgName = StringUtils.isEmpty(annotation.pkgName()
+                        .replace(".", "")) ?
+                        defPrefsPkg : annotation.pkgName();
+                if (pkgName.endsWith(".")) {
+                    pkgName = pkgName.substring(0, pkgName.length() - 1);
+                }
+            }
+            String classNameVal = annotation.currentClassName() ?
+                    element.getSimpleName().toString() : annotation.className();
+            String qualifiedName = typeElement.getQualifiedName().toString();
+            if (StringUtils.isEmpty(classNameVal)) {
+                throw new NullPointerException("New class name is empty in "
+                        + qualifiedName + "! Please specify the new class name!");
+            }
+            String className = classPrefix + classNameVal + classSuffix;
+            String fileName = StringUtils.isEmpty(annotation.fileName()) ?
+                    StringUtils.camel2SmallConst(classNameVal) : annotation.fileName();
+            ClassName keyClassName = ClassName.bestGuess(qualifiedName);
+            PrefsClassInfo prefsClassInfo = PrefsClassInfo.newBuilder()
+                    .className(ClassName.get(pkgName, className))
+                    .fileName(fileName)
+                    .keyClassName(keyClassName)
+                    .build();
+            mPrefsClassInfoMap.put(qualifiedName, prefsClassInfo);
         }
     }
 
-    public void handleDefObjectVal(RoundEnvironment roundEnv) {
+    public void handleDefaultVal(RoundEnvironment roundEnv) {
         Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(DefaultValue.class);
         for (Element element : aimElements) {
+            if (element.getKind() != ElementKind.METHOD && element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
             TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
             String qualifiedName = enclosingElement.getQualifiedName().toString();
 
@@ -152,55 +158,54 @@ public class ElementHandler {
                 // if (size > 1) {
                 //     return;
                 // }
+                MethodInfo info = MethodInfo.newBuilder()
+                        .isMethod(true)
+                        .name(executableElement.getSimpleName().toString())
+                        .className(className)
+                        .paramsNum(size)
+                        .build();
+                mDefaultMethodMap.put(key, info);
+            } else if (element.getKind() == ElementKind.FIELD) {
+                VariableElement variableElement = (VariableElement) element;
+                MethodInfo info = MethodInfo.newBuilder()
+                        .isMethod(false)
+                        .name(variableElement.getSimpleName().toString())
+                        .className(className)
+                        .build();
+                mDefaultMethodMap.put(key, info);
+            }
+        }
+    }
+
+    public void handleRuleMethod(RoundEnvironment roundEnv) {
+        for (Class<? extends Annotation> cls : AnnotationList.getRuleMethodList()) {
+            Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(cls);
+            for (Element element : aimElements) {
+                if (element.getKind() != ElementKind.METHOD) {
+                    continue;
+                }
+                TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+                String qualifiedName = enclosingElement.getQualifiedName().toString();
+
+                ClassName className = ClassName.bestGuess(qualifiedName);
+                ExecutableElement executableElement = (ExecutableElement) element;
+                int size = executableElement.getParameters().size();
+                // 序列化
+                // if (size > 2 || size < 1) {
+                //     continue;
+                // }
+                // 反序列化
+                // if (size > 3 || size < 2) {
+                //     return;
+                // }
                 MethodInfo params = MethodInfo.newBuilder()
                         .isMethod(true)
                         .name(executableElement.getSimpleName().toString())
                         .className(className)
                         .paramsNum(size)
                         .build();
-                mUserMethodParams.put(key, params);
-            } else if (element.getKind() == ElementKind.FIELD) {
-                VariableElement variableElement = (VariableElement) element;
-                MethodInfo params = MethodInfo.newBuilder()
-                        .isMethod(false)
-                        .name(variableElement.getSimpleName().toString())
-                        .className(className)
-                        .build();
-                mUserMethodParams.put(key, params);
-            }
-        }
-    }
-
-    public void handleRuleMethod(RoundEnvironment roundEnv) {
-        Map<Class<? extends Annotation>, Integer> map = AnnotationList.getRuleMethod();
-        Set<Class<? extends Annotation>> classes = map.keySet();
-        for (Class<? extends Annotation> cls : classes) {
-            Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(cls);
-            for (Element element : aimElements) {
-                TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-                String qualifiedName = enclosingElement.getQualifiedName().toString();
-
-                ClassName className = ClassName.bestGuess(qualifiedName);
-                if (element.getKind() == ElementKind.METHOD) {
-                    ExecutableElement executableElement = (ExecutableElement) element;
-                    int size = executableElement.getParameters().size();
-                    // 序列化
-                    // if (size > 2 || size < 1) {
-                    //     continue;
-                    // }
-                    // 反序列化
-                    // if (size > 3 || size < 2) {
-                    //     return;
-                    // }
-                    MethodInfo params = MethodInfo.newBuilder()
-                            .isMethod(true)
-                            .name(executableElement.getSimpleName().toString())
-                            .className(className)
-                            .paramsNum(size)
-                            .build();
-                    mMethodInnerMap.put(map.get(cls), params);
-                    break;
-                }
+                mRuleMethodMap.put(cls, params);
+                break;
             }
         }
     }
@@ -299,7 +304,7 @@ public class ElementHandler {
         // 构造方法
         builder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
-                .addCode(StringUtils.format("super(\"%s\");\n", prefsFileName))
+                .addCode("super($S);\n", prefsFileName)
                 .build());
 
         // 获取实例方法
@@ -336,7 +341,7 @@ public class ElementHandler {
                 .valueName("String")
                 .typeName(mStringTypeName);
 
-        for (Class<? extends Annotation> cls : AnnotationList.getPrefsVal()) {
+        for (Class<? extends Annotation> cls : AnnotationList.getPrefsKeyList()) {
             Annotation annotation = variableElement.getAnnotation(cls);
             if (annotation instanceof PrefsKey.Int) {
                 PrefsKey.Int annotationObj = (PrefsKey.Int) annotation;
@@ -495,7 +500,7 @@ public class ElementHandler {
 
         // get方法
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
-        methodInfo = mUserMethodParams.get(annotationParams.getDefValFromId());
+        methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
         if (annotationParams.getDefValFromId() > 0 && methodInfo == null) {
             canNotFindDefVal(annotationParams.getDefValFromId());
         }
@@ -611,8 +616,8 @@ public class ElementHandler {
         ClassName serializerClass = null;
         String serializerName = null;
         Class<? extends Annotation> annotationType = params.getAnnotation().annotationType();
-        for (Integer integer : AnnotationList.getSerializerByVal().get(annotationType)) {
-            serializerMethod = mMethodInnerMap.get(integer);
+        for (Class<? extends Annotation> cls : AnnotationList.getSerializerList(annotationType)) {
+            serializerMethod = mRuleMethodMap.get(cls);
             if (serializerMethod == null) {
                 continue;
             }
@@ -627,8 +632,8 @@ public class ElementHandler {
         MethodInfo deserializerMethod = null;
         ClassName deserializerClass = null;
         String deserializerName = null;
-        for (Integer integer : AnnotationList.getDeserializerByVal().get(annotationType)) {
-            deserializerMethod = mMethodInnerMap.get(integer);
+        for (Class<? extends Annotation> cls : AnnotationList.getDeserializerList(annotationType)) {
+            deserializerMethod = mRuleMethodMap.get(cls);
             if (deserializerMethod == null) {
                 continue;
             }
@@ -699,7 +704,7 @@ public class ElementHandler {
                     .endControlFlow();
         } else {
             codeGetBuilder.beginControlFlow("if(value==null)");
-            MethodInfo methodInfo = mUserMethodParams.get(annotationParams.getDefValFromId());
+            MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
             if (methodInfo == null) {
                 canNotFindDefVal(annotationParams.getDefValFromId());
             } else if (methodInfo.isMethod()) {
