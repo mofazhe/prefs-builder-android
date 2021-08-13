@@ -20,7 +20,7 @@ import com.mfz.prefsbuilder.Serializer;
  */
 public class AnnotationList {
     public static List<Class<? extends Annotation>> getPrefsKeyList() {
-        List<Class<? extends Annotation>> set = new ArrayList<>(50);
+        List<Class<? extends Annotation>> set = new ArrayList<>(30);
         set.add(PrefsKey.Int.class);
         set.add(PrefsKey.Float.class);
         set.add(PrefsKey.Bool.class);
@@ -41,7 +41,7 @@ public class AnnotationList {
     }
 
     public static List<Class<? extends Annotation>> getRuleMethodList() {
-        List<Class<? extends Annotation>> map = new ArrayList<>(100);
+        List<Class<? extends Annotation>> map = new ArrayList<>(30);
         map.add(Serializer.Object.class);
         map.add(Serializer.List.class);
         map.add(Serializer.Set.class);
@@ -61,7 +61,7 @@ public class AnnotationList {
     }
 
     public static List<Class<? extends Annotation>> getDeserializerList(Class<? extends Annotation> cls) {
-        List<Class<? extends Annotation>> list = new ArrayList<>();
+        List<Class<? extends Annotation>> list = new ArrayList<>(5);
         if (cls == PrefsKey.List.class) {
             list.add(Deserializer.List.class);
         } else if (cls == PrefsKey.Set.class) {
@@ -80,7 +80,7 @@ public class AnnotationList {
     }
 
     public static List<Class<? extends Annotation>> getSerializerList(Class<? extends Annotation> cls) {
-        List<Class<? extends Annotation>> list = new ArrayList<>();
+        List<Class<? extends Annotation>> list = new ArrayList<>(5);
         if (cls == PrefsKey.List.class) {
             list.add(Serializer.List.class);
         } else if (cls == PrefsKey.Set.class) {
