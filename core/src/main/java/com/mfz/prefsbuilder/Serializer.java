@@ -58,14 +58,14 @@ public class Serializer {
     public @interface Deque {
     }
 
-    /**
-     * Queue对象优先使用，可以不单独定义，不定义则使用
-     * {@link Serializer.Object}
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @Target(ElementType.METHOD)
-    public @interface SparseArray {
-    }
+    // /**
+    //  * Queue对象优先使用，可以不单独定义，不定义则使用
+    //  * {@link Serializer.Object}
+    //  */
+    // @Retention(RetentionPolicy.SOURCE)
+    // @Target(ElementType.METHOD)
+    // public @interface SparseArray {
+    // }
 
     /**
      * map对象优先使用，可以不单独定义，不定义则使用

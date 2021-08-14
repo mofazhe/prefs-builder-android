@@ -71,7 +71,7 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        mHandler.clean();
+        mHandler.prepareToPrecess();
         mHandler.handleBasePrefs(roundEnvironment);
         mHandler.handlePrefsClass(roundEnvironment);
         mHandler.handleCodecMethod(roundEnvironment);

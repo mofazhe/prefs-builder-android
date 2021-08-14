@@ -77,13 +77,13 @@ public class GsonUtils {
         return toObject(json, type);
     }
 
-    @Deserializer.SparseArray
-    public static <T> SparseArray<T> toSparseArray(String json, Class<T> classOfT) {
-        Type type = TypeBuilder.newInstance(SparseArray.class)
-                .addTypeParam(classOfT)
-                .build();
-        return toObject(json, type);
-    }
+    // @Deserializer.SparseArray
+    // public static <T> SparseArray<T> toSparseArray(String json, Class<T> classOfT) {
+    //     Type type = TypeBuilder.newInstance(SparseArray.class)
+    //             .addTypeParam(classOfT)
+    //             .build();
+    //     return toObject(json, type);
+    // }
 
     @Deserializer.Map
     public static <K, V> Map<K, V> toMap(String json, Class<K> keyCls, Class<V> valCls) {

@@ -1,6 +1,8 @@
 package com.mfz.prefsbuilder.annotationprocessor;
 
+import com.mfz.prefsbuilder.PrefsDefVal;
 import com.mfz.prefsbuilder.PrefsKeyHeadTail;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
 import java.util.Locale;
@@ -64,7 +66,11 @@ public class MethodUtils {
         return transformerClass(element, "suffixType", PrefsKeyHeadTail.class, elements);
     }
 
-    public static TypeName transformerClass(Element element, String key, Class<?> clazz, Elements elements) {
+    public static TypeName getEmptyType(Element element, Elements elements) {
+        return transformerClass(element, "emptyType", PrefsDefVal.class, elements);
+    }
+
+    private static TypeName transformerClass(Element element, String key, Class<?> clazz, Elements elements) {
         AnnotationMirror am = getAnnotationMirror(element, clazz);
         if (am == null) {
             return null;
@@ -104,7 +110,9 @@ public class MethodUtils {
             }
             TypeMirror typeMirror = elem.asType();
             if (typeMirror != null) {
-                return TypeName.get(typeMirror);
+                // mz: 2021/08/14 使用原始类型，而不是泛型
+                // return TypeName.get(typeMirror);
+                return ClassName.bestGuess(elem.toString());
             }
         }
         return null;

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,16 @@ public class AnnotationList {
         return set;
     }
 
+    public static Map<Class<? extends Annotation>, Class<?>> getDefEmptyMap() {
+        Map<Class<? extends Annotation>, Class<?>> set = new HashMap<>(8);
+        set.put(PrefsKey.List.class, ArrayList.class);
+        set.put(PrefsKey.Set.class, HashSet.class);
+        set.put(PrefsKey.Queue.class, LinkedList.class);
+        set.put(PrefsKey.Deque.class, LinkedList.class);
+        set.put(PrefsKey.Map.class, HashMap.class);
+        return set;
+    }
+
     public static List<Class<? extends Annotation>> getRuleMethodList() {
         List<Class<? extends Annotation>> map = new ArrayList<>(30);
         map.add(Serializer.Object.class);
@@ -47,7 +58,7 @@ public class AnnotationList {
         map.add(Serializer.Set.class);
         map.add(Serializer.Queue.class);
         map.add(Serializer.Deque.class);
-        map.add(Serializer.SparseArray.class);
+        // map.add(Serializer.SparseArray.class);
         map.add(Serializer.Map.class);
 
         map.add(Deserializer.Object.class);
@@ -55,7 +66,7 @@ public class AnnotationList {
         map.add(Deserializer.Set.class);
         map.add(Deserializer.Queue.class);
         map.add(Deserializer.Deque.class);
-        map.add(Deserializer.SparseArray.class);
+        // map.add(Deserializer.SparseArray.class);
         map.add(Deserializer.Map.class);
         return map;
     }
@@ -70,8 +81,8 @@ public class AnnotationList {
             list.add(Deserializer.Queue.class);
         } else if (cls == PrefsKey.Deque.class) {
             list.add(Deserializer.Deque.class);
-        // } else if (cls == PrefsKey.SparseArray.class) {
-        //     list.add(Deserializer.SparseArray.class);
+            // } else if (cls == PrefsKey.SparseArray.class) {
+            //     list.add(Deserializer.SparseArray.class);
         } else if (cls == PrefsKey.Map.class) {
             list.add(Deserializer.Map.class);
         }
@@ -89,8 +100,8 @@ public class AnnotationList {
             list.add(Serializer.Queue.class);
         } else if (cls == PrefsKey.Deque.class) {
             list.add(Serializer.Deque.class);
-        // } else if (cls == PrefsKey.SparseArray.class) {
-        //     list.add(Serializer.SparseArray.class);
+            // } else if (cls == PrefsKey.SparseArray.class) {
+            //     list.add(Serializer.SparseArray.class);
         } else if (cls == PrefsKey.Map.class) {
             list.add(Serializer.Map.class);
         }

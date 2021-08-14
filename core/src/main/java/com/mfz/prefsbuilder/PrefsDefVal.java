@@ -43,6 +43,14 @@ public @interface PrefsDefVal {
     boolean defEmpty() default true;
 
     /**
+     * 当集合类型要求返回空列表{@link #defEmpty()}时
+     * 用该值指定实际的返回的类型
+     *
+     * @return the class
+     */
+    Class<?> emptyType() default void.class;
+
+    /**
      * 默认的string
      * 除基础变量和String类型外，其他类型都是序列化为String来保存的
      * 所以只有其他类型会有该参数，该参数用于反序列化

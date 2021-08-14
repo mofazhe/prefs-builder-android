@@ -3,9 +3,16 @@ package com.mfz.prefsbuilder.annotationprocessor.data;
 import com.mfz.prefsbuilder.PrefsDefVal;
 import com.mfz.prefsbuilder.PrefsGenerateCtrl;
 import com.mfz.prefsbuilder.PrefsParams;
+import com.mfz.prefsbuilder.annotationprocessor.ElementHandler;
 import com.mfz.prefsbuilder.annotationprocessor.MethodUtils;
 import com.mfz.prefsbuilder.annotationprocessor.StringUtils;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.WildcardTypeName;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -31,6 +38,7 @@ public class AnnotationParams {
     private String mPrefixParamName;
     private String mSuffixParamName;
     private String mKeyStatement;
+    private TypeName mEmptyTypeName;
 
     private AnnotationParams(Builder builder) {
         setDefNull(builder.mDefNull);
@@ -47,6 +55,7 @@ public class AnnotationParams {
         setPrefixParamName(builder.mPrefixParamName);
         setSuffixParamName(builder.mSuffixParamName);
         setKeyStatement(builder.mKeyStatement);
+        setEmptyTypeName(builder.mEmptyTypeName);
     }
 
     public static Builder newBuilder() {
@@ -165,8 +174,19 @@ public class AnnotationParams {
         mKeyStatement = keyStatement;
     }
 
-    public static AnnotationParams create(VariableElement element, Elements mElementUtils) {
-        AnnotationParams.Builder builder = AnnotationParams.newBuilder();
+    public TypeName getEmptyTypeName() {
+        return mEmptyTypeName;
+    }
+
+    public void setEmptyTypeName(TypeName emptyTypeName) {
+        mEmptyTypeName = emptyTypeName;
+    }
+
+    public static AnnotationParams create(ElementHandler handler,
+                                          VariableElement element,
+                                          Class<? extends Annotation> annotationCls) {
+        Builder builder = AnnotationParams.newBuilder();
+        Elements elementUtils = handler.getElementUtils();
 
         PrefsParams prefParams = element.getAnnotation(PrefsParams.class);
         if (prefParams != null) {
@@ -174,10 +194,19 @@ public class AnnotationParams {
         }
         PrefsDefVal prefsDefVal = element.getAnnotation(PrefsDefVal.class);
         if (prefsDefVal != null) {
+            Map<Class<? extends Annotation>, Class<?>> defEmptyMap = handler.getDefEmptyMap();
+            TypeName emptyType = null;
+            if (defEmptyMap.containsKey(annotationCls)) {
+                emptyType = MethodUtils.getEmptyType(element, elementUtils);
+                if (emptyType == null || TypeName.VOID.equals(emptyType)) {
+                    emptyType = TypeName.get(defEmptyMap.get(annotationCls));
+                }
+            }
             builder.defValFromId(prefsDefVal.defValFromId())
                     .defNull(prefsDefVal.defNull())
                     .defEmpty(prefsDefVal.defEmpty())
-                    .defString(prefsDefVal.defString());
+                    .defString(prefsDefVal.defString())
+                    .emptyTypeName(emptyType);
         }
         PrefsGenerateCtrl generateCtrl = element.getAnnotation(PrefsGenerateCtrl.class);
         if (generateCtrl != null) {
@@ -185,8 +214,8 @@ public class AnnotationParams {
                     .generateContains(generateCtrl.generateContains());
         }
 
-        TypeName prefixType = MethodUtils.getPrefixType(element, mElementUtils);
-        TypeName suffixType = MethodUtils.getSuffixType(element, mElementUtils);
+        TypeName prefixType = MethodUtils.getPrefixType(element, elementUtils);
+        TypeName suffixType = MethodUtils.getSuffixType(element, elementUtils);
 
         boolean hasPrefix = prefixType != null && prefixType != TypeName.VOID;
         boolean hasSuffix = suffixType != null && suffixType != TypeName.VOID;
@@ -224,6 +253,7 @@ public class AnnotationParams {
         builder.mPrefixParamName = getPrefixParamName();
         builder.mSuffixParamName = getSuffixParamName();
         builder.mKeyStatement = getKeyStatement();
+        builder.mEmptyTypeName = getEmptyTypeName();
         return builder;
     }
 
@@ -242,6 +272,7 @@ public class AnnotationParams {
         private String mPrefixParamName;
         private String mSuffixParamName;
         private String mKeyStatement;
+        private TypeName mEmptyTypeName;
 
         private Builder() {
             mDefNull = true;
@@ -327,6 +358,11 @@ public class AnnotationParams {
 
         public Builder keyStatement(String val) {
             mKeyStatement = val;
+            return this;
+        }
+
+        public Builder emptyTypeName(TypeName val) {
+            mEmptyTypeName = val;
             return this;
         }
 

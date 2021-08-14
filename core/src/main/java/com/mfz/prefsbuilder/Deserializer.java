@@ -54,13 +54,13 @@ public class Deserializer {
     public @interface Deque {
     }
 
-    /**
-     * The interface Sparse array.
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @Target(ElementType.METHOD)
-    public @interface SparseArray {
-    }
+    // /**
+    //  * The interface Sparse array.
+    //  */
+    // @Retention(RetentionPolicy.SOURCE)
+    // @Target(ElementType.METHOD)
+    // public @interface SparseArray {
+    // }
 
     /**
      * The interface Map.

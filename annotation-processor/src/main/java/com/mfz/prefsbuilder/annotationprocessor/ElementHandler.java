@@ -57,6 +57,7 @@ public class ElementHandler {
     private final TypeName mStringTypeName;
     private ClassName mBasePrefsClassname;
     private final ProcessingEnvironment mProcessingEnv;
+    private Map<Class<? extends Annotation>, Class<?>> mDefEmptyMap;
 
     public ElementHandler(Filer filer, Elements elementUtils, ProcessingEnvironment processingEnv) {
         mFiler = filer;
@@ -65,13 +66,22 @@ public class ElementHandler {
         mStringTypeName = TypeName.get(String.class);
     }
 
-    public void clean() {
+    public Elements getElementUtils() {
+        return mElementUtils;
+    }
+
+    public Map<Class<? extends Annotation>, Class<?>> getDefEmptyMap() {
+        return mDefEmptyMap;
+    }
+
+    public void prepareToPrecess() {
         mClassKeyMap.clear();
         mDefaultMethodMap.clear();
         mRuleMethodMap.clear();
         mPrefsClassInfoMap.clear();
         mDecodeMethodMap.clear();
         mEncodeMethodMap.clear();
+        mDefEmptyMap = AnnotationList.getDefEmptyMap();
     }
 
     public void handleBasePrefs(RoundEnvironment roundEnv) {
@@ -340,7 +350,9 @@ public class ElementHandler {
             }
             PrefsKey.String annotation = element.getAnnotation(PrefsKey.String.class);
             VariableElement variableElement = (VariableElement) element;
-            AnnotationParams annotationParams = AnnotationParams.create(variableElement, mElementUtils);
+            AnnotationParams annotationParams = AnnotationParams.create(this,
+                    variableElement,
+                    annotation.annotationType());
             addToClassMap(createKeyParamsWithout(variableElement, annotation)
                     .typeName(mStringTypeName)
                     .defValue(annotationParams.isDefNull() ? null : annotation.defVal())
@@ -414,14 +426,16 @@ public class ElementHandler {
     }
 
     public KeyParams.Builder createKeyParams(VariableElement element, Class<? extends Annotation> annotationCls) {
-        AnnotationParams annotationParams = AnnotationParams.create(element, mElementUtils);
+        AnnotationParams annotationParams = AnnotationParams.create(this, element, annotationCls);
 
         return createKeyParamsWithout(element, annotationCls)
                 .annotationParams(annotationParams);
     }
 
     public KeyParams.Builder createKeyParams(VariableElement element, Annotation annotation) {
-        AnnotationParams annotationParams = AnnotationParams.create(element, mElementUtils);
+        AnnotationParams annotationParams = AnnotationParams.create(this,
+                element,
+                annotation.annotationType());
 
         return createKeyParamsWithout(element, annotation)
                 .annotationParams(annotationParams);
@@ -719,24 +733,7 @@ public class ElementHandler {
             codeGetBuilder.addStatement("return value");
         } else if (annotationParams.isDefEmpty()) {
             codeGetBuilder.beginControlFlow("if(value==null)");
-            if (params.getAnnotation() instanceof PrefsKey.List) {
-                TypeName defType = TypeName.get(ArrayList.class);
-                codeGetBuilder.addStatement("return new $T<>()", defType);
-            } else if (params.getAnnotation() instanceof PrefsKey.Set) {
-                TypeName defType = TypeName.get(HashSet.class);
-                codeGetBuilder.addStatement("return new $T<>()", defType);
-            } else if (params.getAnnotation() instanceof PrefsKey.Queue) {
-                TypeName defType = TypeName.get(LinkedList.class);
-                codeGetBuilder.addStatement("return new $T<>()", defType);
-            } else if (params.getAnnotation() instanceof PrefsKey.Deque) {
-                TypeName defType = TypeName.get(LinkedList.class);
-                codeGetBuilder.addStatement("return new $T<>()", defType);
-                // } else if (params.getAnnotation() instanceof PrefsKey.SparseArray) {
-                //     codeGetBuilder.addStatement("return new $T()", params.getTypeName());
-            } else if (params.getAnnotation() instanceof PrefsKey.Map) {
-                TypeName defType = TypeName.get(HashMap.class);
-                codeGetBuilder.addStatement("return new $T<>()", defType);
-            }
+            codeGetBuilder.addStatement("return new $T<>()", annotationParams.getEmptyTypeName());
             codeGetBuilder.nextControlFlow("else")
                     .addStatement("return value")
                     .endControlFlow();

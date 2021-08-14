@@ -10,9 +10,12 @@ import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -125,12 +128,16 @@ public class PrefsConst {
     public static final String TEST_LIST = "d";
 
     @PrefsKey.List(type = Test.class)
-    @PrefsDefVal()
+    @PrefsDefVal(defNull = false,emptyType = LinkedList.class)
     public static final String TEST_LIST_EMPTY = "d";
 
     @PrefsKey.Set(type = Test.class)
     @PrefsDefVal(defEmpty = false, defValFromId = 3)
     public static final String TEST_SET = "e";
+
+    @PrefsKey.Set(type = Test.class)
+    @PrefsDefVal(emptyType = LinkedHashSet.class, defNull = false)
+    public static final String TEST_SET_EMPTY = "ea";
 
     @PrefsKey.Queue(type = String.class)
     @PrefsDefVal(defEmpty = false, defValFromId = 4)
@@ -142,13 +149,17 @@ public class PrefsConst {
     @PrefsKeyHeadTail(prefixType = int.class)
     public static final String TEST_DEQUE = "g";
 
+    @PrefsKey.Deque(type = Test.class)
+    @PrefsDefVal(defNull = false, defValFromId = 5, emptyType = ArrayDeque.class)
+    public static final String TEST_DEQUE_EMPTY = "ga";
+
     // @PrefsKey.SparseArray(type = String.class)
     // @PrefsDefVal(defEmpty = false, defValFromId = 7)
     // @PrefsKeyHeadTail(prefixType = int.class)
     // public static final String TEST_SPARSE_ARRAY = "g";
 
     @PrefsKey.Map(keyType = String.class, valType = Test.class)
-    @PrefsDefVal(defEmpty = false, defValFromId = 6)
+    @PrefsDefVal(defEmpty = false, defValFromId = 6, emptyType = LinkedHashMap.class)
     public static final String TEST_MAP = "h";
 
     @DefaultValue(id = 123)
