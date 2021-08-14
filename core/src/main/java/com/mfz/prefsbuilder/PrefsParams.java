@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-public @interface PrefParams {
+public @interface PrefsParams {
 
     /**
      * 编解码方法id

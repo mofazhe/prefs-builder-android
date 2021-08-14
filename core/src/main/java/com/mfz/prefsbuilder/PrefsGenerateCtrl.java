@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-public @interface PrefGenerateCtrl {
+public @interface PrefsGenerateCtrl {
 
     /**
      * 是否要生成对应的remove方法

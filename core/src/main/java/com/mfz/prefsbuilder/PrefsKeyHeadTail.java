@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-public @interface PrefKeyHeadTail {
+public @interface PrefsKeyHeadTail {
 
     /**
      * key的前缀class类型

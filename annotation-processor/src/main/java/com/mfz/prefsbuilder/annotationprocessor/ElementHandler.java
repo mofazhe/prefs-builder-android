@@ -2,9 +2,9 @@ package com.mfz.prefsbuilder.annotationprocessor;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
 import com.mfz.prefsbuilder.DefaultValue;
-import com.mfz.prefsbuilder.PrefDefVal;
-import com.mfz.prefsbuilder.PrefGenerateCtrl;
-import com.mfz.prefsbuilder.PrefParams;
+import com.mfz.prefsbuilder.PrefsDefVal;
+import com.mfz.prefsbuilder.PrefsGenerateCtrl;
+import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 import com.mfz.prefsbuilder.StringCodec;
@@ -51,7 +51,7 @@ import javax.lang.model.util.Elements;
 public class ElementHandler {
     private final Filer mFiler;
     private final Elements mElementUtils;
-    private final Map<String, List<Element>> mClassElementMap = new HashMap<>();
+    private final Map<String, List<KeyParams>> mClassKeyMap = new HashMap<>();
     private final Map<Integer, MethodInfo> mDefaultMethodMap = new HashMap<>();
     private final Map<Class<? extends Annotation>, MethodInfo> mRuleMethodMap = new HashMap<>();
     private final Map<String, PrefsClassInfo> mPrefsClassInfoMap = new HashMap<>();
@@ -69,7 +69,7 @@ public class ElementHandler {
     }
 
     public void clean() {
-        mClassElementMap.clear();
+        mClassKeyMap.clear();
         mDefaultMethodMap.clear();
         mRuleMethodMap.clear();
         mPrefsClassInfoMap.clear();
@@ -243,12 +243,15 @@ public class ElementHandler {
             }
             TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
             String fullClassName = enclosingElement.getQualifiedName().toString();
-            List<Element> elementList = mClassElementMap.get(fullClassName);
-            if (elementList == null) {
-                elementList = new ArrayList<>();
-                mClassElementMap.put(fullClassName, elementList);
+            List<KeyParams> paramsList = mClassKeyMap.get(fullClassName);
+            if (paramsList == null) {
+                paramsList = new ArrayList<>();
+                mClassKeyMap.put(fullClassName, paramsList);
             }
-            elementList.add(element);
+            paramsList.add(KeyParams.newBuilder()
+                    .element((VariableElement) element)
+                    .annotation(element.getAnnotation(annotation))
+                    .build());
         }
     }
 
@@ -256,13 +259,13 @@ public class ElementHandler {
         if (mBasePrefsClassname == null) {
             throw new NullPointerException("Base prefs class is null! Please implement BasePrefsInterface!");
         }
-        Set<Map.Entry<String, List<Element>>> entrySet = mClassElementMap.entrySet();
-        for (Map.Entry<String, List<Element>> entry : entrySet) {
+        Set<Map.Entry<String, List<KeyParams>>> entrySet = mClassKeyMap.entrySet();
+        for (Map.Entry<String, List<KeyParams>> entry : entrySet) {
             createPrefs(entry.getKey(), entry.getValue());
         }
     }
 
-    private void createPrefs(String fullClassName, List<Element> elementList) {
+    private void createPrefs(String fullClassName, List<KeyParams> paramsList) {
         PrefsClassInfo classInfo = mPrefsClassInfoMap.get(fullClassName);
         if (classInfo == null) {
             throw new NullPointerException("The class not statement annotation:" + fullClassName);
@@ -301,8 +304,8 @@ public class ElementHandler {
                 .build());
 
         // get和set方法
-        for (Element element : elementList) {
-            addMethod(builder, element);
+        for (KeyParams keyParams : paramsList) {
+            addMethod(builder, keyParams);
         }
 
         JavaFile javaFile = JavaFile.builder(className.packageName(), builder.build())
@@ -314,116 +317,109 @@ public class ElementHandler {
         }
     }
 
-    public void addMethod(TypeSpec.Builder classBuilder, Element element) {
-
+    public void addMethod(TypeSpec.Builder classBuilder, KeyParams inputParams) {
+        VariableElement element = inputParams.getElement();
         TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
         String qualifiedName = enclosingElement.getQualifiedName().toString();
 
-        VariableElement variableElement = (VariableElement) element;
-
-        KeyParams.Builder builder = KeyParams.newBuilder()
+        KeyParams.Builder builder = inputParams.builder()
                 .currentClass(ClassName.bestGuess(qualifiedName))
-                .filedName(variableElement.getSimpleName().toString())
+                .filedName(element.getSimpleName().toString())
                 .valueName("String")
                 .typeName(mStringTypeName);
 
-        for (Class<? extends Annotation> cls : AnnotationList.getPrefsKeyList()) {
-            Annotation annotation = variableElement.getAnnotation(cls);
-            if (annotation instanceof PrefsKey.Int) {
-                PrefsKey.Int annotationObj = (PrefsKey.Int) annotation;
-                builder.typeName(TypeName.INT)
-                        .defValue(annotationObj.defVal())
-                        .valueName("Int");
-            } else if (annotation instanceof PrefsKey.Float) {
-                PrefsKey.Float annotationObj = (PrefsKey.Float) annotation;
-                builder.typeName(TypeName.FLOAT)
-                        .defValue(annotationObj.defVal() + "f")
-                        .valueName("Float");
-            } else if (annotation instanceof PrefsKey.Bool) {
-                PrefsKey.Bool annotationObj = (PrefsKey.Bool) annotation;
-                builder.typeName(TypeName.BOOLEAN)
-                        .defValue(annotationObj.defVal())
-                        .valueName("Bool");
-            } else if (annotation instanceof PrefsKey.Byte) {
-                PrefsKey.Byte annotationObj = (PrefsKey.Byte) annotation;
-                builder.typeName(TypeName.BYTE)
-                        .defValue(StringUtils.format("(byte)%d", annotationObj.defVal()))
-                        .valueName("Byte");
-            } else if (annotation instanceof PrefsKey.Double) {
-                PrefsKey.Double annotationObj = (PrefsKey.Double) annotation;
-                builder.typeName(TypeName.DOUBLE)
-                        .defValue(annotationObj.defVal())
-                        .valueName("Double");
-            } else if (annotation instanceof PrefsKey.Char) {
-                PrefsKey.Char annotationObj = (PrefsKey.Char) annotation;
-                char defChar = annotationObj.defVal();
-                builder.typeName(TypeName.CHAR)
-                        .defValue(Character.isDefined(defChar) ?
-                                StringUtils.format("'%c'", defChar) :
-                                StringUtils.format("(char)%d", (int) defChar))
-                        .valueName("Char");
-            } else if (annotation instanceof PrefsKey.Long) {
-                PrefsKey.Long annotationObj = (PrefsKey.Long) annotation;
-                builder.typeName(TypeName.LONG)
-                        .defValue(annotationObj.defVal())
-                        .valueName("Long");
-            } else if (annotation instanceof PrefsKey.Short) {
-                PrefsKey.Short annotationObj = (PrefsKey.Short) annotation;
-                builder.typeName(TypeName.SHORT)
-                        .defValue(StringUtils.format("(short)%d", annotationObj.defVal()))
-                        .valueName("Short");
-            } else if (annotation instanceof PrefsKey.String) {
-                PrefsKey.String annotationObj = (PrefsKey.String) annotation;
-                builder.typeName(mStringTypeName)
-                        .defValue(annotationObj.defVal())
-                        .valueName("String");
-            } else if (annotation instanceof PrefsKey.Object) {
-                TypeName typeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(typeName)
-                        .keyTypeName(typeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.List) {
-                TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(List.class, subTypeName))
-                        .keyTypeName(subTypeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.Set) {
-                TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(Set.class, subTypeName))
-                        .keyTypeName(subTypeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.Queue) {
-                TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(Queue.class, subTypeName))
-                        .keyTypeName(subTypeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.Deque) {
-                TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(Deque.class, subTypeName))
-                        .keyTypeName(subTypeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.SparseArray) {
-                TypeName subTypeName = MethodUtils.getType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(ClassName.bestGuess("android.util.SparseArray"), subTypeName))
-                        .keyTypeName(subTypeName)
-                        .genericVal(true);
-            } else if (annotation instanceof PrefsKey.Map) {
-                TypeName keyTypeName = MethodUtils.getKeyType(element, cls, mElementUtils);
-                TypeName valTypeName = MethodUtils.getValType(element, cls, mElementUtils);
-                builder.typeName(getParameterizedTypedName(Map.class, keyTypeName, valTypeName))
-                        .keyTypeName(keyTypeName)
-                        .valTypeName(valTypeName)
-                        .genericVal(true);
-            }
-            if (annotation != null) {
-                builder.annotation(annotation);
-                break;
-            }
+        Annotation annotation = inputParams.getAnnotation();
+        Class<? extends Annotation> annotationType = annotation.annotationType();
+        if (annotation instanceof PrefsKey.Int) {
+            PrefsKey.Int annotationObj = (PrefsKey.Int) annotation;
+            builder.typeName(TypeName.INT)
+                    .defValue(annotationObj.defVal())
+                    .valueName("Int");
+        } else if (annotation instanceof PrefsKey.Float) {
+            PrefsKey.Float annotationObj = (PrefsKey.Float) annotation;
+            builder.typeName(TypeName.FLOAT)
+                    .defValue(annotationObj.defVal() + "f")
+                    .valueName("Float");
+        } else if (annotation instanceof PrefsKey.Bool) {
+            PrefsKey.Bool annotationObj = (PrefsKey.Bool) annotation;
+            builder.typeName(TypeName.BOOLEAN)
+                    .defValue(annotationObj.defVal())
+                    .valueName("Bool");
+        } else if (annotation instanceof PrefsKey.Byte) {
+            PrefsKey.Byte annotationObj = (PrefsKey.Byte) annotation;
+            builder.typeName(TypeName.BYTE)
+                    .defValue(StringUtils.format("(byte)%d", annotationObj.defVal()))
+                    .valueName("Byte");
+        } else if (annotation instanceof PrefsKey.Double) {
+            PrefsKey.Double annotationObj = (PrefsKey.Double) annotation;
+            builder.typeName(TypeName.DOUBLE)
+                    .defValue(annotationObj.defVal())
+                    .valueName("Double");
+        } else if (annotation instanceof PrefsKey.Char) {
+            PrefsKey.Char annotationObj = (PrefsKey.Char) annotation;
+            char defChar = annotationObj.defVal();
+            builder.typeName(TypeName.CHAR)
+                    .defValue(Character.isDefined(defChar) ?
+                            StringUtils.format("'%c'", defChar) :
+                            StringUtils.format("(char)%d", (int) defChar))
+                    .valueName("Char");
+        } else if (annotation instanceof PrefsKey.Long) {
+            PrefsKey.Long annotationObj = (PrefsKey.Long) annotation;
+            builder.typeName(TypeName.LONG)
+                    .defValue(annotationObj.defVal())
+                    .valueName("Long");
+        } else if (annotation instanceof PrefsKey.Short) {
+            PrefsKey.Short annotationObj = (PrefsKey.Short) annotation;
+            builder.typeName(TypeName.SHORT)
+                    .defValue(StringUtils.format("(short)%d", annotationObj.defVal()))
+                    .valueName("Short");
+        } else if (annotation instanceof PrefsKey.String) {
+            PrefsKey.String annotationObj = (PrefsKey.String) annotation;
+            builder.typeName(mStringTypeName)
+                    .defValue(annotationObj.defVal())
+                    .valueName("String");
+        } else if (annotation instanceof PrefsKey.Object) {
+            TypeName typeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(typeName)
+                    .keyTypeName(typeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.List) {
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(List.class, subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.Set) {
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(Set.class, subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.Queue) {
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(Queue.class, subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.Deque) {
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(Deque.class, subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.SparseArray) {
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(ClassName.bestGuess("android.util.SparseArray"), subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true);
+        } else if (annotation instanceof PrefsKey.Map) {
+            TypeName keyTypeName = MethodUtils.getKeyType(element, annotationType, mElementUtils);
+            TypeName valTypeName = MethodUtils.getValType(element, annotationType, mElementUtils);
+            builder.typeName(getParameterizedTypedName(Map.class, keyTypeName, valTypeName))
+                    .keyTypeName(keyTypeName)
+                    .valTypeName(valTypeName)
+                    .genericVal(true);
         }
 
         KeyParams params = builder.build();
 
-        params.setAnnotationParams(buildAnnotationParams(variableElement, params));
+        params.setAnnotationParams(buildAnnotationParams(element, params));
 
         if (mStringTypeName.equals(params.getTypeName())) {
             if (params.getAnnotationParams().isDefNull()) {
@@ -441,18 +437,18 @@ public class ElementHandler {
     private AnnotationParams buildAnnotationParams(VariableElement element, KeyParams params) {
         AnnotationParams.Builder builder = AnnotationParams.newBuilder();
 
-        PrefParams prefParams = element.getAnnotation(PrefParams.class);
+        PrefsParams prefParams = element.getAnnotation(PrefsParams.class);
         if (prefParams != null) {
             builder.codeId(prefParams.codecId());
         }
-        PrefDefVal prefDefVal = element.getAnnotation(PrefDefVal.class);
-        if (prefDefVal != null) {
-            builder.defValFromId(prefDefVal.defValFromId())
-                    .defNull(prefDefVal.defNull())
-                    .defEmpty(prefDefVal.defEmpty())
-                    .defString(prefDefVal.defString());
+        PrefsDefVal prefsDefVal = element.getAnnotation(PrefsDefVal.class);
+        if (prefsDefVal != null) {
+            builder.defValFromId(prefsDefVal.defValFromId())
+                    .defNull(prefsDefVal.defNull())
+                    .defEmpty(prefsDefVal.defEmpty())
+                    .defString(prefsDefVal.defString());
         }
-        PrefGenerateCtrl generateCtrl = element.getAnnotation(PrefGenerateCtrl.class);
+        PrefsGenerateCtrl generateCtrl = element.getAnnotation(PrefsGenerateCtrl.class);
         if (generateCtrl != null) {
             builder.generateRemove(generateCtrl.generateRemove())
                     .generateContains(generateCtrl.generateContains());

@@ -3,10 +3,10 @@ package com.mfz.demo.utils;
 import android.util.SparseArray;
 
 import com.mfz.prefsbuilder.DefaultValue;
-import com.mfz.prefsbuilder.PrefDefVal;
-import com.mfz.prefsbuilder.PrefGenerateCtrl;
-import com.mfz.prefsbuilder.PrefKeyHeadTail;
-import com.mfz.prefsbuilder.PrefParams;
+import com.mfz.prefsbuilder.PrefsDefVal;
+import com.mfz.prefsbuilder.PrefsGenerateCtrl;
+import com.mfz.prefsbuilder.PrefsKeyHeadTail;
+import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 
@@ -33,103 +33,122 @@ public class PrefsConst {
         public static final String TEST_INT = "null";
 
         @PrefsKey.String()
-        @PrefDefVal(defNull = true)
+        @PrefsDefVal(defNull = true)
         public static final String TEST_STRING = "b";
 
         @PrefsKey.String(defVal = "111")
-        @PrefDefVal(defNull = false)
-        @PrefGenerateCtrl()
+        @PrefsDefVal(defNull = false)
+        @PrefsGenerateCtrl()
         public static final String TEST_STRING_NOT = "b";
 
         @PrefsKey.Byte()
-        @PrefGenerateCtrl(generateContains = false)
+        @PrefsGenerateCtrl(generateContains = false)
+        public static final String TEST_BYTE = "c";
+    }
+
+    @PrefsClass(pkgName = "com.mfz.test", className = "AccountPrefs")
+    public static class Account {
+        @PrefsKey.Int()
+        public static final String TEST_INT = "null";
+
+        @PrefsKey.String()
+        @PrefsDefVal(defNull = true)
+        public static final String TEST_STRING = "b";
+
+        @PrefsKey.String(defVal = "111")
+        @PrefsDefVal(defNull = false)
+        @PrefsGenerateCtrl()
+        public static final String TEST_STRING_NOT = "b";
+
+        @PrefsKey.Byte()
+        @PrefsGenerateCtrl(generateContains = false)
         public static final String TEST_BYTE = "c";
     }
 
     @PrefsKey.Int(defVal = 122)
-    @PrefDefVal(defValFromId = 123)
-    @PrefGenerateCtrl(generateRemove = false)
+    @PrefsDefVal(defValFromId = 123)
+    @PrefsGenerateCtrl(generateRemove = false)
     public static final String TEST_INT = "a";
 
     @PrefsKey.Float(defVal = 1.233300f)
-    @PrefDefVal(defValFromId = 133)
+    @PrefsDefVal(defValFromId = 133)
     public static final String TEST_FLOAT = "float";
 
     @PrefsKey.Bool(defVal = true)
-    @PrefDefVal(defValFromId = 144)
-    @PrefGenerateCtrl(generateRemove = false, generateContains = false)
+    @PrefsDefVal(defValFromId = 144)
+    @PrefsGenerateCtrl(generateRemove = false, generateContains = false)
     public static final String TEST_BOOL = "a";
 
     @PrefsKey.Bool(defVal = true)
-    @PrefParams()
+    @PrefsParams()
     public static final String IS_TEST_IS_BOOL = "a";
 
     @PrefsKey.Byte(defVal = 12)
-    @PrefDefVal(defValFromId = 155)
+    @PrefsDefVal(defValFromId = 155)
     public static final String TEST_BYTE = "a";
 
     @PrefsKey.Double(defVal = 102.2435235)
-    @PrefDefVal(defValFromId = 166)
+    @PrefsDefVal(defValFromId = 166)
     public static final String TEST_DOUBLE = "a";
 
     @PrefsKey.Char(defVal = 's')
-    @PrefDefVal(defValFromId = 177)
-    @PrefKeyHeadTail(prefixType = byte.class)
+    @PrefsDefVal(defValFromId = 177)
+    @PrefsKeyHeadTail(prefixType = byte.class)
     public static final String TEST_CHAR = "a";
 
     @PrefsKey.Short(defVal = 234)
-    @PrefDefVal(defValFromId = 188)
-    @PrefParams(codecId = 1)
+    @PrefsDefVal(defValFromId = 188)
+    @PrefsParams(codecId = 1)
     public static final String TEST_SHORT = "a";
 
     @PrefsKey.String()
-    @PrefDefVal(defValFromId = 111)
-    @PrefKeyHeadTail(prefixType = float.class, suffixType = double.class)
+    @PrefsDefVal(defValFromId = 111)
+    @PrefsKeyHeadTail(prefixType = float.class, suffixType = double.class)
     public static final String TEST_STRING = "b";
 
     @PrefsKey.String(defVal = "[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]")
-    @PrefDefVal()
+    @PrefsDefVal()
     public static final String TEST_STRING_JSON = "b";
 
     @PrefsKey.String()
-    @PrefDefVal(defNull = true)
-    @PrefParams(codecId = 1)
-    @PrefKeyHeadTail(prefixType = String.class, suffixType = int.class)
+    @PrefsDefVal(defNull = true)
+    @PrefsParams(codecId = 1)
+    @PrefsKeyHeadTail(prefixType = String.class, suffixType = int.class)
     public static final String TEST_STRING_BASE64 = "b";
 
     @PrefsKey.Object(type = Test.class)
-    @PrefDefVal(defValFromId = 1, defNull = true)
+    @PrefsDefVal(defValFromId = 1, defNull = true)
     public static final String TEST_OBJECT = "c";
 
     @PrefsKey.List(type = Test.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 2, defString = "[]")
+    @PrefsDefVal(defEmpty = false, defValFromId = 2, defString = "[]")
     public static final String TEST_LIST = "d";
 
     @PrefsKey.List(type = Test.class)
-    @PrefDefVal()
+    @PrefsDefVal()
     public static final String TEST_LIST_EMPTY = "d";
 
     @PrefsKey.Set(type = Test.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 3)
+    @PrefsDefVal(defEmpty = false, defValFromId = 3)
     public static final String TEST_SET = "e";
 
     @PrefsKey.Queue(type = String.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 4)
-    @PrefKeyHeadTail(suffixType = String.class)
+    @PrefsDefVal(defEmpty = false, defValFromId = 4)
+    @PrefsKeyHeadTail(suffixType = String.class)
     public static final String TEST_QUEUE = "f";
 
     @PrefsKey.Deque(type = Test.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 5)
-    @PrefKeyHeadTail(prefixType = int.class)
+    @PrefsDefVal(defEmpty = false, defValFromId = 5)
+    @PrefsKeyHeadTail(prefixType = int.class)
     public static final String TEST_DEQUE = "g";
 
     @PrefsKey.SparseArray(type = String.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 7)
-    @PrefKeyHeadTail(prefixType = int.class)
+    @PrefsDefVal(defEmpty = false, defValFromId = 7)
+    @PrefsKeyHeadTail(prefixType = int.class)
     public static final String TEST_SPARSE_ARRAY = "g";
 
     @PrefsKey.Map(keyType = String.class, valType = Test.class)
-    @PrefDefVal(defEmpty = false, defValFromId = 6)
+    @PrefsDefVal(defEmpty = false, defValFromId = 6)
     public static final String TEST_MAP = "h";
 
     @DefaultValue(id = 123)

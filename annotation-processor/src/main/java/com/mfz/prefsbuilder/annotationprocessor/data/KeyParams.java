@@ -5,6 +5,8 @@ import com.squareup.javapoet.TypeName;
 
 import java.lang.annotation.Annotation;
 
+import javax.lang.model.element.VariableElement;
+
 /**
  * @author cjj
  * @version 1.0
@@ -22,6 +24,7 @@ public class KeyParams {
     private TypeName mKeyTypeName;
     private TypeName mValTypeName;
     private boolean mGenericVal;
+    private VariableElement mElement;
 
     private KeyParams(Builder builder) {
         setFiledName(builder.mFiledName);
@@ -34,6 +37,7 @@ public class KeyParams {
         setKeyTypeName(builder.mKeyTypeName);
         setValTypeName(builder.mValTypeName);
         setGenericVal(builder.mGenericVal);
+        setElement(builder.mElement);
     }
 
     public static Builder newBuilder() {
@@ -120,6 +124,14 @@ public class KeyParams {
         mGenericVal = genericVal;
     }
 
+    public VariableElement getElement() {
+        return mElement;
+    }
+
+    public void setElement(VariableElement element) {
+        mElement = element;
+    }
+
     public Builder builder() {
         Builder builder = new Builder();
         builder.mFiledName = getFiledName();
@@ -132,6 +144,7 @@ public class KeyParams {
         builder.mKeyTypeName = getKeyTypeName();
         builder.mValTypeName = getValTypeName();
         builder.mGenericVal = isGenericVal();
+        builder.mElement = getElement();
         return builder;
     }
 
@@ -146,6 +159,7 @@ public class KeyParams {
         private TypeName mKeyTypeName;
         private TypeName mValTypeName;
         private boolean mGenericVal;
+        private VariableElement mElement;
 
         private Builder() {
         }
@@ -197,6 +211,11 @@ public class KeyParams {
 
         public Builder genericVal(boolean val) {
             mGenericVal = val;
+            return this;
+        }
+
+        public Builder element(VariableElement val) {
+            mElement = val;
             return this;
         }
 
