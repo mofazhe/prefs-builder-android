@@ -35,7 +35,7 @@ public class AnnotationList {
         set.add(PrefsKey.Set.class);
         set.add(PrefsKey.Queue.class);
         set.add(PrefsKey.Deque.class);
-        set.add(PrefsKey.SparseArray.class);
+        // set.add(PrefsKey.SparseArray.class);
         set.add(PrefsKey.Map.class);
         return set;
     }
@@ -70,8 +70,8 @@ public class AnnotationList {
             list.add(Deserializer.Queue.class);
         } else if (cls == PrefsKey.Deque.class) {
             list.add(Deserializer.Deque.class);
-        } else if (cls == PrefsKey.SparseArray.class) {
-            list.add(Deserializer.SparseArray.class);
+        // } else if (cls == PrefsKey.SparseArray.class) {
+        //     list.add(Deserializer.SparseArray.class);
         } else if (cls == PrefsKey.Map.class) {
             list.add(Deserializer.Map.class);
         }
@@ -89,8 +89,8 @@ public class AnnotationList {
             list.add(Serializer.Queue.class);
         } else if (cls == PrefsKey.Deque.class) {
             list.add(Serializer.Deque.class);
-        } else if (cls == PrefsKey.SparseArray.class) {
-            list.add(Serializer.SparseArray.class);
+        // } else if (cls == PrefsKey.SparseArray.class) {
+        //     list.add(Serializer.SparseArray.class);
         } else if (cls == PrefsKey.Map.class) {
             list.add(Serializer.Map.class);
         }

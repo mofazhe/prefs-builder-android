@@ -142,10 +142,10 @@ public class PrefsConst {
     @PrefsKeyHeadTail(prefixType = int.class)
     public static final String TEST_DEQUE = "g";
 
-    @PrefsKey.SparseArray(type = String.class)
-    @PrefsDefVal(defEmpty = false, defValFromId = 7)
-    @PrefsKeyHeadTail(prefixType = int.class)
-    public static final String TEST_SPARSE_ARRAY = "g";
+    // @PrefsKey.SparseArray(type = String.class)
+    // @PrefsDefVal(defEmpty = false, defValFromId = 7)
+    // @PrefsKeyHeadTail(prefixType = int.class)
+    // public static final String TEST_SPARSE_ARRAY = "g";
 
     @PrefsKey.Map(keyType = String.class, valType = Test.class)
     @PrefsDefVal(defEmpty = false, defValFromId = 6)

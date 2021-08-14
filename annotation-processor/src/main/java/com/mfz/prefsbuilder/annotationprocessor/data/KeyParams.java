@@ -17,7 +17,8 @@ public class KeyParams {
     private String mFiledName;
     private String mValueName;
     private Object mDefValue;
-    private ClassName mCurrentClass;
+    private ClassName mFullClassName;
+    private String mFullClassStr;
     private TypeName mTypeName;
     private AnnotationParams mAnnotationParams;
     private Annotation mAnnotation;
@@ -30,7 +31,8 @@ public class KeyParams {
         setFiledName(builder.mFiledName);
         setValueName(builder.mValueName);
         setDefValue(builder.mDefValue);
-        setCurrentClass(builder.mCurrentClass);
+        setFullClassName(builder.mFullClassName);
+        setFullClassStr(builder.mFullClassStr);
         setTypeName(builder.mTypeName);
         setAnnotationParams(builder.mAnnotationParams);
         setAnnotation(builder.mAnnotation);
@@ -68,12 +70,20 @@ public class KeyParams {
         mDefValue = defValue;
     }
 
-    public ClassName getCurrentClass() {
-        return mCurrentClass;
+    public ClassName getFullClassName() {
+        return mFullClassName;
     }
 
-    public void setCurrentClass(ClassName currentClass) {
-        mCurrentClass = currentClass;
+    public void setFullClassName(ClassName fullClassName) {
+        mFullClassName = fullClassName;
+    }
+
+    public String getFullClassStr() {
+        return mFullClassStr;
+    }
+
+    public void setFullClassStr(String fullClassStr) {
+        mFullClassStr = fullClassStr;
     }
 
     public TypeName getTypeName() {
@@ -137,7 +147,8 @@ public class KeyParams {
         builder.mFiledName = getFiledName();
         builder.mValueName = getValueName();
         builder.mDefValue = getDefValue();
-        builder.mCurrentClass = getCurrentClass();
+        builder.mFullClassName = getFullClassName();
+        builder.mFullClassStr = getFullClassStr();
         builder.mTypeName = getTypeName();
         builder.mAnnotationParams = getAnnotationParams();
         builder.mAnnotation = getAnnotation();
@@ -152,7 +163,8 @@ public class KeyParams {
         private String mFiledName;
         private String mValueName;
         private Object mDefValue;
-        private ClassName mCurrentClass;
+        private ClassName mFullClassName;
+        private String mFullClassStr;
         private TypeName mTypeName;
         private AnnotationParams mAnnotationParams;
         private Annotation mAnnotation;
@@ -179,8 +191,13 @@ public class KeyParams {
             return this;
         }
 
-        public Builder currentClass(ClassName val) {
-            mCurrentClass = val;
+        public Builder fullClassName(ClassName val) {
+            mFullClassName = val;
+            return this;
+        }
+
+        public Builder fullClassStr(String val) {
+            mFullClassStr = val;
             return this;
         }
 

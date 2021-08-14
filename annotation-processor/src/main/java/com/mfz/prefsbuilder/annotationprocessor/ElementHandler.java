@@ -2,9 +2,6 @@ package com.mfz.prefsbuilder.annotationprocessor;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
 import com.mfz.prefsbuilder.DefaultValue;
-import com.mfz.prefsbuilder.PrefsDefVal;
-import com.mfz.prefsbuilder.PrefsGenerateCtrl;
-import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 import com.mfz.prefsbuilder.StringCodec;
@@ -235,24 +232,217 @@ public class ElementHandler {
                 .build();
     }
 
-    public void handlePrefsVal(RoundEnvironment roundEnv, Class<? extends Annotation> annotation) {
-        Set<? extends Element> aimElements = roundEnv.getElementsAnnotatedWith(annotation);
-        for (Element element : aimElements) {
+    public void handlePrefsKey(RoundEnvironment roundEnv) {
+        Class<? extends Annotation> cls;
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Bool.class)) {
             if (element.getKind() != ElementKind.FIELD) {
-                return;
+                continue;
             }
-            TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-            String fullClassName = enclosingElement.getQualifiedName().toString();
-            List<KeyParams> paramsList = mClassKeyMap.get(fullClassName);
-            if (paramsList == null) {
-                paramsList = new ArrayList<>();
-                mClassKeyMap.put(fullClassName, paramsList);
-            }
-            paramsList.add(KeyParams.newBuilder()
-                    .element((VariableElement) element)
-                    .annotation(element.getAnnotation(annotation))
+            PrefsKey.Bool annotation = element.getAnnotation(PrefsKey.Bool.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.BOOLEAN)
+                    .defValue(annotation.defVal())
+                    .valueName("Bool")
                     .build());
         }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Byte.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Byte annotation = element.getAnnotation(PrefsKey.Byte.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.BYTE)
+                    .defValue(StringUtils.format("(byte)%d", annotation.defVal()))
+                    .valueName("Byte")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Char.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Char annotation = element.getAnnotation(PrefsKey.Char.class);
+            char defVal = annotation.defVal();
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.CHAR)
+                    .defValue(Character.isDefined(defVal) ?
+                            StringUtils.format("'%c'", defVal) :
+                            StringUtils.format("(char)%d", (int) defVal))
+                    .valueName("Char")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Short.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Short annotation = element.getAnnotation(PrefsKey.Short.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.SHORT)
+                    .defValue(annotation.defVal())
+                    .valueName("Short")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Int.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Int annotation = element.getAnnotation(PrefsKey.Int.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.INT)
+                    .defValue(annotation.defVal())
+                    .valueName("Int")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Long.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Long annotation = element.getAnnotation(PrefsKey.Long.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.LONG)
+                    .defValue(annotation.defVal() + "L")
+                    .valueName("Long")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Float.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Float annotation = element.getAnnotation(PrefsKey.Float.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.FLOAT)
+                    .defValue(annotation.defVal() + "f")
+                    .valueName("Float")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.Double.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.Double annotation = element.getAnnotation(PrefsKey.Double.class);
+            addToClassMap(createKeyParams((VariableElement) element, annotation)
+                    .typeName(TypeName.DOUBLE)
+                    .defValue(annotation.defVal())
+                    .valueName("Double")
+                    .build());
+        }
+
+        for (Element element : roundEnv.getElementsAnnotatedWith(PrefsKey.String.class)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            PrefsKey.String annotation = element.getAnnotation(PrefsKey.String.class);
+            VariableElement variableElement = (VariableElement) element;
+            AnnotationParams annotationParams = AnnotationParams.create(variableElement, mElementUtils);
+            addToClassMap(createKeyParamsWithout(variableElement, annotation)
+                    .typeName(mStringTypeName)
+                    .defValue(annotationParams.isDefNull() ? null : annotation.defVal())
+                    .valueName("String")
+                    .annotationParams(annotationParams)
+                    .build());
+        }
+
+        cls = PrefsKey.Object.class;
+        for (Element element : roundEnv.getElementsAnnotatedWith(cls)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            TypeName typeName = MethodUtils.getType(element, cls, mElementUtils);
+            addToClassMap(createKeyParams((VariableElement) element, cls)
+                    .typeName(typeName)
+                    .keyTypeName(typeName)
+                    .genericVal(true)
+                    .build());
+        }
+
+        handleCollectionType(roundEnv, PrefsKey.List.class, List.class);
+        handleCollectionType(roundEnv, PrefsKey.Set.class, Set.class);
+        handleCollectionType(roundEnv, PrefsKey.Queue.class, Queue.class);
+        handleCollectionType(roundEnv, PrefsKey.Deque.class, Deque.class);
+
+        handleMapType(roundEnv);
+    }
+
+    public void handleCollectionType(RoundEnvironment roundEnv,
+                                     Class<? extends Annotation> annotationType,
+                                     Class<?> clazz) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
+            addToClassMap(createKeyParams((VariableElement) element, annotationType)
+                    .typeName(getParameterizedTypedName(clazz, subTypeName))
+                    .keyTypeName(subTypeName)
+                    .genericVal(true)
+                    .build());
+        }
+    }
+
+    public void handleMapType(RoundEnvironment roundEnv) {
+        Class<? extends Annotation> annotationType = PrefsKey.Map.class;
+        for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
+            if (element.getKind() != ElementKind.FIELD) {
+                continue;
+            }
+            TypeName keyTypeName = MethodUtils.getKeyType(element, annotationType, mElementUtils);
+            TypeName valTypeName = MethodUtils.getValType(element, annotationType, mElementUtils);
+            addToClassMap(createKeyParams((VariableElement) element, annotationType)
+                    .typeName(getParameterizedTypedName(Map.class, keyTypeName, valTypeName))
+                    .keyTypeName(keyTypeName)
+                    .valTypeName(valTypeName)
+                    .genericVal(true)
+                    .build());
+        }
+    }
+
+    public void addToClassMap(KeyParams params) {
+        String fullClassStr = params.getFullClassStr();
+        List<KeyParams> paramsList = mClassKeyMap.get(fullClassStr);
+        if (paramsList == null) {
+            paramsList = new ArrayList<>();
+            mClassKeyMap.put(fullClassStr, paramsList);
+        }
+        paramsList.add(params);
+    }
+
+    public KeyParams.Builder createKeyParams(VariableElement element, Class<? extends Annotation> annotationCls) {
+        AnnotationParams annotationParams = AnnotationParams.create(element, mElementUtils);
+
+        return createKeyParamsWithout(element, annotationCls)
+                .annotationParams(annotationParams);
+    }
+
+    public KeyParams.Builder createKeyParams(VariableElement element, Annotation annotation) {
+        AnnotationParams annotationParams = AnnotationParams.create(element, mElementUtils);
+
+        return createKeyParamsWithout(element, annotation)
+                .annotationParams(annotationParams);
+    }
+
+    public KeyParams.Builder createKeyParamsWithout(VariableElement element, Class<? extends Annotation> annotationCls) {
+        Annotation annotation = element.getAnnotation(annotationCls);
+        return createKeyParamsWithout(element, annotation);
+    }
+
+    public KeyParams.Builder createKeyParamsWithout(VariableElement element, Annotation annotation) {
+        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+        String fullClassStr = enclosingElement.getQualifiedName().toString();
+
+        return KeyParams.newBuilder()
+                .element((VariableElement) element)
+                .annotation(annotation)
+                .fullClassName(ClassName.bestGuess(fullClassStr))
+                .fullClassStr(fullClassStr)
+                .filedName(element.getSimpleName().toString())
+                .valueName("String");
     }
 
     public void createJavaFiles() {
@@ -317,146 +507,12 @@ public class ElementHandler {
         }
     }
 
-    public void addMethod(TypeSpec.Builder classBuilder, KeyParams inputParams) {
-        VariableElement element = inputParams.getElement();
-        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String qualifiedName = enclosingElement.getQualifiedName().toString();
-
-        KeyParams.Builder builder = inputParams.builder()
-                .currentClass(ClassName.bestGuess(qualifiedName))
-                .filedName(element.getSimpleName().toString())
-                .valueName("String")
-                .typeName(mStringTypeName);
-
-        Annotation annotation = inputParams.getAnnotation();
-        Class<? extends Annotation> annotationType = annotation.annotationType();
-        if (annotation instanceof PrefsKey.Int) {
-            PrefsKey.Int annotationObj = (PrefsKey.Int) annotation;
-            builder.typeName(TypeName.INT)
-                    .defValue(annotationObj.defVal())
-                    .valueName("Int");
-        } else if (annotation instanceof PrefsKey.Float) {
-            PrefsKey.Float annotationObj = (PrefsKey.Float) annotation;
-            builder.typeName(TypeName.FLOAT)
-                    .defValue(annotationObj.defVal() + "f")
-                    .valueName("Float");
-        } else if (annotation instanceof PrefsKey.Bool) {
-            PrefsKey.Bool annotationObj = (PrefsKey.Bool) annotation;
-            builder.typeName(TypeName.BOOLEAN)
-                    .defValue(annotationObj.defVal())
-                    .valueName("Bool");
-        } else if (annotation instanceof PrefsKey.Byte) {
-            PrefsKey.Byte annotationObj = (PrefsKey.Byte) annotation;
-            builder.typeName(TypeName.BYTE)
-                    .defValue(StringUtils.format("(byte)%d", annotationObj.defVal()))
-                    .valueName("Byte");
-        } else if (annotation instanceof PrefsKey.Double) {
-            PrefsKey.Double annotationObj = (PrefsKey.Double) annotation;
-            builder.typeName(TypeName.DOUBLE)
-                    .defValue(annotationObj.defVal())
-                    .valueName("Double");
-        } else if (annotation instanceof PrefsKey.Char) {
-            PrefsKey.Char annotationObj = (PrefsKey.Char) annotation;
-            char defChar = annotationObj.defVal();
-            builder.typeName(TypeName.CHAR)
-                    .defValue(Character.isDefined(defChar) ?
-                            StringUtils.format("'%c'", defChar) :
-                            StringUtils.format("(char)%d", (int) defChar))
-                    .valueName("Char");
-        } else if (annotation instanceof PrefsKey.Long) {
-            PrefsKey.Long annotationObj = (PrefsKey.Long) annotation;
-            builder.typeName(TypeName.LONG)
-                    .defValue(annotationObj.defVal())
-                    .valueName("Long");
-        } else if (annotation instanceof PrefsKey.Short) {
-            PrefsKey.Short annotationObj = (PrefsKey.Short) annotation;
-            builder.typeName(TypeName.SHORT)
-                    .defValue(StringUtils.format("(short)%d", annotationObj.defVal()))
-                    .valueName("Short");
-        } else if (annotation instanceof PrefsKey.String) {
-            PrefsKey.String annotationObj = (PrefsKey.String) annotation;
-            builder.typeName(mStringTypeName)
-                    .defValue(annotationObj.defVal())
-                    .valueName("String");
-        } else if (annotation instanceof PrefsKey.Object) {
-            TypeName typeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(typeName)
-                    .keyTypeName(typeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.List) {
-            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(List.class, subTypeName))
-                    .keyTypeName(subTypeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.Set) {
-            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(Set.class, subTypeName))
-                    .keyTypeName(subTypeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.Queue) {
-            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(Queue.class, subTypeName))
-                    .keyTypeName(subTypeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.Deque) {
-            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(Deque.class, subTypeName))
-                    .keyTypeName(subTypeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.SparseArray) {
-            TypeName subTypeName = MethodUtils.getType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(ClassName.bestGuess("android.util.SparseArray"), subTypeName))
-                    .keyTypeName(subTypeName)
-                    .genericVal(true);
-        } else if (annotation instanceof PrefsKey.Map) {
-            TypeName keyTypeName = MethodUtils.getKeyType(element, annotationType, mElementUtils);
-            TypeName valTypeName = MethodUtils.getValType(element, annotationType, mElementUtils);
-            builder.typeName(getParameterizedTypedName(Map.class, keyTypeName, valTypeName))
-                    .keyTypeName(keyTypeName)
-                    .valTypeName(valTypeName)
-                    .genericVal(true);
-        }
-
-        KeyParams params = builder.build();
-
-        params.setAnnotationParams(buildAnnotationParams(element, params));
-
-        if (mStringTypeName.equals(params.getTypeName())) {
-            if (params.getAnnotationParams().isDefNull()) {
-                params.setDefValue(null);
-            }
-        }
-
+    public void addMethod(TypeSpec.Builder classBuilder, KeyParams params) {
         if (params.isGenericVal()) {
             buildGenericMethod(classBuilder, params);
         } else {
             buildBasicMethod(classBuilder, params);
         }
-    }
-
-    private AnnotationParams buildAnnotationParams(VariableElement element, KeyParams params) {
-        AnnotationParams.Builder builder = AnnotationParams.newBuilder();
-
-        PrefsParams prefParams = element.getAnnotation(PrefsParams.class);
-        if (prefParams != null) {
-            builder.codeId(prefParams.codecId());
-        }
-        PrefsDefVal prefsDefVal = element.getAnnotation(PrefsDefVal.class);
-        if (prefsDefVal != null) {
-            builder.defValFromId(prefsDefVal.defValFromId())
-                    .defNull(prefsDefVal.defNull())
-                    .defEmpty(prefsDefVal.defEmpty())
-                    .defString(prefsDefVal.defString());
-        }
-        PrefsGenerateCtrl generateCtrl = element.getAnnotation(PrefsGenerateCtrl.class);
-        if (generateCtrl != null) {
-            builder.generateRemove(generateCtrl.generateRemove())
-                    .generateContains(generateCtrl.generateContains());
-        }
-
-        return builder.prefixTypeName(MethodUtils.getPrefixType(element, mElementUtils))
-                .suffixTypeName(MethodUtils.getSuffixType(element, mElementUtils))
-                .build(params);
     }
 
     private ParameterizedTypeName getParameterizedTypedName(Class<?> clazz, TypeName... subTypeName) {
@@ -501,7 +557,7 @@ public class ElementHandler {
             } else if (methodInfo.getParamsNum() == 1) {
                 codeGetBuilder.addStatement(StringUtils.format(
                         "$T defVal=$T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
-                        params.getTypeName(), methodInfo.getClassName(), params.getCurrentClass());
+                        params.getTypeName(), methodInfo.getClassName(), params.getFullClassName());
             } else {
                 notSupportMethod(methodInfo, 0, 1);
             }
@@ -513,11 +569,11 @@ public class ElementHandler {
         if (mStringTypeName != params.getTypeName() || methodInfo == null) {
             codeGetBuilder.addStatement(
                     StringUtils.format("return getInstance().get%s(%s, defVal)",
-                            params.getValueName(), annotationParams.getKeyStatement()), params.getCurrentClass());
+                            params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
         } else {
             codeGetBuilder.addStatement(
                     StringUtils.format("$T s=getInstance().get%s(%s, defVal)",
-                            params.getValueName(), annotationParams.getKeyStatement()), mStringTypeName, params.getCurrentClass());
+                            params.getValueName(), annotationParams.getKeyStatement()), mStringTypeName, params.getFullClassName());
             if (methodInfo.getParamsNum() == 1) {
                 codeGetBuilder.addStatement(StringUtils.format("return $T.%s(s)",
                         methodInfo.getName()), methodInfo.getClassName());
@@ -552,7 +608,7 @@ public class ElementHandler {
         methodInfo = mEncodeMethodMap.get(annotationParams.getCodeId());
         if (mStringTypeName != params.getTypeName() || methodInfo == null) {
             codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, value)", params.getValueName(), annotationParams.getKeyStatement()), params.getCurrentClass());
+                    "getInstance().set%s(%s, value)", params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
         } else {
             if (methodInfo.getParamsNum() == 1) {
                 codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(value)",
@@ -564,7 +620,7 @@ public class ElementHandler {
                 notSupportMethod(methodInfo, 1, 2);
             }
             codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, encode)", params.getValueName(), annotationParams.getKeyStatement()), params.getCurrentClass());
+                    "getInstance().set%s(%s, encode)", params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
         }
 
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getSetMethodName(params.getFiledName()))
@@ -631,7 +687,7 @@ public class ElementHandler {
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         codeGetBuilder.addStatement(StringUtils.format(
                 "$T json = getInstance().get%s(%s, $S)",
-                valueName, annotationParams.getKeyStatement()), mStringTypeName, params.getCurrentClass(), annotationParams.getDefString());
+                valueName, annotationParams.getKeyStatement()), mStringTypeName, params.getFullClassName(), annotationParams.getDefString());
         if (params.getValTypeName() == null) {
             if (deserializerMethod.getParamsNum() == 2) {
                 codeGetBuilder.addStatement(StringUtils.format(
@@ -641,7 +697,7 @@ public class ElementHandler {
                 codeGetBuilder.addStatement(StringUtils.format(
                         "$T value = $T.%s(%s,json,$T.class)",
                         deserializerName, annotationParams.getKeyStatement()), params.getTypeName(), deserializerClass,
-                        params.getCurrentClass(), params.getKeyTypeName());
+                        params.getFullClassName(), params.getKeyTypeName());
             } else {
                 notSupportMethod(serializerMethod, 2, 3);
             }
@@ -654,7 +710,7 @@ public class ElementHandler {
                 codeGetBuilder.addStatement(StringUtils.format(
                         "$T value = $T.%s(%s,json,$T.class,$T.class)",
                         deserializerName, annotationParams.getKeyStatement()), params.getTypeName(), deserializerClass,
-                        params.getCurrentClass(), params.getKeyTypeName(), params.getValTypeName());
+                        params.getFullClassName(), params.getKeyTypeName(), params.getValTypeName());
             } else {
                 notSupportMethod(serializerMethod, 3, 4);
             }
@@ -675,8 +731,8 @@ public class ElementHandler {
             } else if (params.getAnnotation() instanceof PrefsKey.Deque) {
                 TypeName defType = TypeName.get(LinkedList.class);
                 codeGetBuilder.addStatement("return new $T<>()", defType);
-            } else if (params.getAnnotation() instanceof PrefsKey.SparseArray) {
-                codeGetBuilder.addStatement("return new $T()", params.getTypeName());
+                // } else if (params.getAnnotation() instanceof PrefsKey.SparseArray) {
+                //     codeGetBuilder.addStatement("return new $T()", params.getTypeName());
             } else if (params.getAnnotation() instanceof PrefsKey.Map) {
                 TypeName defType = TypeName.get(HashMap.class);
                 codeGetBuilder.addStatement("return new $T<>()", defType);
@@ -696,7 +752,7 @@ public class ElementHandler {
                 } else if (methodInfo.getParamsNum() == 1) {
                     codeGetBuilder.addStatement(StringUtils.format(
                             "return $T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
-                            methodInfo.getClassName(), params.getCurrentClass());
+                            methodInfo.getClassName(), params.getFullClassName());
                 } else {
                     notSupportMethod(serializerMethod, 0, 1);
                 }
@@ -726,12 +782,12 @@ public class ElementHandler {
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
         if (serializerMethod.getParamsNum() == 1) {
             codeSetBuilder.addStatement(StringUtils.format("getInstance().set%s(%s, $T.%s(value))",
-                    valueName, annotationParams.getKeyStatement(), serializerName), params.getCurrentClass(), serializerClass);
+                    valueName, annotationParams.getKeyStatement(), serializerName), params.getFullClassName(), serializerClass);
         } else if (serializerMethod.getParamsNum() == 2) {
             codeSetBuilder.addStatement(StringUtils.format(
                     "getInstance().set%s(%s, $T.%s(%s,value))",
                     valueName, annotationParams.getKeyStatement(), serializerName, annotationParams.getKeyStatement()),
-                    params.getCurrentClass(), serializerClass, params.getCurrentClass());
+                    params.getFullClassName(), serializerClass, params.getFullClassName());
         } else {
             notSupportMethod(serializerMethod, 1, 2);
         }
@@ -763,7 +819,7 @@ public class ElementHandler {
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().remove(%s)", annotationParams.getKeyStatement()), params.getCurrentClass());
+                "return getInstance().remove(%s)", annotationParams.getKeyStatement()), params.getFullClassName());
 
         MethodSpec.Builder methodBuilder;
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getRemoveMethodName(params.getFiledName()))
@@ -785,7 +841,7 @@ public class ElementHandler {
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().contains(%s)", annotationParams.getKeyStatement()), params.getCurrentClass());
+                "return getInstance().contains(%s)", annotationParams.getKeyStatement()), params.getFullClassName());
 
         MethodSpec.Builder methodBuilder;
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getContainsMethodName(params.getFiledName()))

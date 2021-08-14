@@ -233,22 +233,24 @@ public class PrefsKey {
         Class<?> type();
     }
 
-    /**
-     * SparseArray类型
-     * 需要设置序列化和反序列化方法(序列化可使用object的)
-     * 这是android库的类，若使用Gson库则需要手动添加序列化与反序列化适配器
-     */
-    @Retention(RetentionPolicy.SOURCE)
-    @Target(ElementType.FIELD)
-    public @interface SparseArray {
-
-        /**
-         * 返回值类型
-         *
-         * @return the class
-         */
-        Class<?> type();
-    }
+    // /**
+    //  * SparseArray类型
+    //  * 需要设置序列化和反序列化方法(序列化可使用object的)
+    //  * 这是android库的类，若使用Gson库则需要手动添加序列化与反序列化适配器
+    //  *
+    //  * 暂时不支持，后续会提供支持
+    //  */
+    // @Retention(RetentionPolicy.SOURCE)
+    // @Target(ElementType.FIELD)
+    // public @interface SparseArray {
+    //
+    //     /**
+    //      * 返回值类型
+    //      *
+    //      * @return the class
+    //      */
+    //     Class<?> type();
+    // }
 
     /**
      * {@link java.util.Map}类型

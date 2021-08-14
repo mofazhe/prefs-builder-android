@@ -77,9 +77,7 @@ public class PrefsBuilderProcessor extends AbstractProcessor {
         mHandler.handleCodecMethod(roundEnvironment);
         mHandler.handleDefaultVal(roundEnvironment);
         mHandler.handleRuleMethod(roundEnvironment);
-        for (Class<? extends Annotation> c : AnnotationList.getPrefsKeyList()) {
-            mHandler.handlePrefsVal(roundEnvironment, c);
-        }
+        mHandler.handlePrefsKey(roundEnvironment);
         mHandler.createJavaFiles();
         return true;
     }

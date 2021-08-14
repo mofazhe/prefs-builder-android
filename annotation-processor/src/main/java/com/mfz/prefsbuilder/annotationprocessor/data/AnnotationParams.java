@@ -1,7 +1,14 @@
 package com.mfz.prefsbuilder.annotationprocessor.data;
 
+import com.mfz.prefsbuilder.PrefsDefVal;
+import com.mfz.prefsbuilder.PrefsGenerateCtrl;
+import com.mfz.prefsbuilder.PrefsParams;
+import com.mfz.prefsbuilder.annotationprocessor.MethodUtils;
 import com.mfz.prefsbuilder.annotationprocessor.StringUtils;
 import com.squareup.javapoet.TypeName;
+
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 
 /**
  * @author cjj
@@ -158,6 +165,49 @@ public class AnnotationParams {
         mKeyStatement = keyStatement;
     }
 
+    public static AnnotationParams create(VariableElement element, Elements mElementUtils) {
+        AnnotationParams.Builder builder = AnnotationParams.newBuilder();
+
+        PrefsParams prefParams = element.getAnnotation(PrefsParams.class);
+        if (prefParams != null) {
+            builder.codeId(prefParams.codecId());
+        }
+        PrefsDefVal prefsDefVal = element.getAnnotation(PrefsDefVal.class);
+        if (prefsDefVal != null) {
+            builder.defValFromId(prefsDefVal.defValFromId())
+                    .defNull(prefsDefVal.defNull())
+                    .defEmpty(prefsDefVal.defEmpty())
+                    .defString(prefsDefVal.defString());
+        }
+        PrefsGenerateCtrl generateCtrl = element.getAnnotation(PrefsGenerateCtrl.class);
+        if (generateCtrl != null) {
+            builder.generateRemove(generateCtrl.generateRemove())
+                    .generateContains(generateCtrl.generateContains());
+        }
+
+        TypeName prefixType = MethodUtils.getPrefixType(element, mElementUtils);
+        TypeName suffixType = MethodUtils.getSuffixType(element, mElementUtils);
+
+        boolean hasPrefix = prefixType != null && prefixType != TypeName.VOID;
+        boolean hasSuffix = suffixType != null && suffixType != TypeName.VOID;
+
+        String keyStatement = "$T.%s";
+        if (hasPrefix) {
+            keyStatement = builder.mPrefixParamName + "+" + keyStatement;
+        }
+        if (hasSuffix) {
+            keyStatement = keyStatement + "+" + builder.mSuffixParamName;
+        }
+        keyStatement = StringUtils.format(keyStatement, element.getSimpleName().toString());
+
+        return builder.hasPrefix(hasPrefix)
+                .hasSuffix(hasSuffix)
+                .prefixTypeName(prefixType)
+                .suffixTypeName(suffixType)
+                .keyStatement(keyStatement)
+                .build();
+    }
+
     public Builder builder() {
         Builder builder = new Builder();
         builder.mDefNull = isDefNull();
@@ -280,26 +330,8 @@ public class AnnotationParams {
             return this;
         }
 
-        public AnnotationParams build(KeyParams params) {
-            boolean hasPrefix = mPrefixTypeName != null
-                    && mPrefixTypeName != TypeName.VOID;
-            boolean hasSuffix = mSuffixTypeName != null
-                    && mSuffixTypeName != TypeName.VOID;
-
-            String keyStatement;
-            if (hasPrefix && hasSuffix) {
-                keyStatement = mPrefixParamName + "+$T.%s+" + mSuffixParamName;
-            } else if (hasPrefix) {
-                keyStatement = mPrefixParamName + "+$T.%s";
-            } else if (hasSuffix) {
-                keyStatement = "$T.%s+" + mSuffixParamName;
-            } else {
-                keyStatement = "$T.%s";
-            }
-            keyStatement = StringUtils.format(keyStatement, params.getFiledName());
-            return new AnnotationParams(hasPrefix(hasPrefix)
-                    .hasSuffix(hasSuffix)
-                    .keyStatement(keyStatement));
+        public AnnotationParams build() {
+            return new AnnotationParams(this);
         }
     }
 }
