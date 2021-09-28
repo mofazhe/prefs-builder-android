@@ -1,12 +1,13 @@
 package com.mfz.prefsbuilder.annotationprocessor;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
+import com.mfz.prefsbuilder.DefValSrc;
 import com.mfz.prefsbuilder.DefaultValue;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 import com.mfz.prefsbuilder.StringCodec;
-import com.mfz.prefsbuilder.annotationprocessor.data.KeyParams;
 import com.mfz.prefsbuilder.annotationprocessor.data.AnnotationParams;
+import com.mfz.prefsbuilder.annotationprocessor.data.KeyParams;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -21,8 +22,6 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -355,7 +354,7 @@ public class ElementHandler {
                     annotation.annotationType());
             addToClassMap(createKeyParamsWithout(variableElement, annotation)
                     .typeName(mStringTypeName)
-                    .defValue(annotationParams.isDefNull() ? null : annotation.defVal())
+                    .defValue(annotationParams.getDefValSrc() == DefValSrc.NULL ? null : annotation.defVal())
                     .valueName("String")
                     .annotationParams(annotationParams)
                     .build());
@@ -553,7 +552,8 @@ public class ElementHandler {
         // get方法
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
-        if (annotationParams.getDefValFromId() > 0 && methodInfo == null) {
+        if (annotationParams.getDefValSrc() == DefValSrc.FROM_ID
+                && methodInfo == null) {
             canNotFindDefVal(annotationParams.getDefValFromId());
         }
         if (methodInfo == null) {
@@ -729,38 +729,47 @@ public class ElementHandler {
                 notSupportMethod(serializerMethod, 3, 4);
             }
         }
-        if (annotationParams.isDefNull()) {
-            codeGetBuilder.addStatement("return value");
-        } else if (annotationParams.isDefEmpty()) {
-            codeGetBuilder.beginControlFlow("if(value==null)");
-            codeGetBuilder.addStatement("return new $T<>()", annotationParams.getEmptyTypeName());
-            codeGetBuilder.nextControlFlow("else")
-                    .addStatement("return value")
-                    .endControlFlow();
-        } else {
-            codeGetBuilder.beginControlFlow("if(value==null)");
-            MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
-            if (methodInfo == null) {
-                canNotFindDefVal(annotationParams.getDefValFromId());
-            } else if (methodInfo.isMethod()) {
-                if (methodInfo.getParamsNum() == 0) {
-                    codeGetBuilder.addStatement(StringUtils.format(
-                            "return $T.%s()", methodInfo.getName()), methodInfo.getClassName());
-                } else if (methodInfo.getParamsNum() == 1) {
-                    codeGetBuilder.addStatement(StringUtils.format(
-                            "return $T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
-                            methodInfo.getClassName(), params.getFullClassName());
+        switch (annotationParams.getDefValSrc()) {
+            default:
+            case DEFAULT:
+                if (annotationType == PrefsKey.Object.class) {
+                    codeGetBuilder.addStatement("return value");
                 } else {
-                    notSupportMethod(serializerMethod, 0, 1);
+                    codeGetBuilder.beginControlFlow("if(value==null)");
+                    codeGetBuilder.addStatement("return new $T<>()", annotationParams.getEmptyTypeName());
+                    codeGetBuilder.nextControlFlow("else")
+                            .addStatement("return value")
+                            .endControlFlow();
                 }
-            } else {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "return $T.%s", methodInfo.getName()), methodInfo.getClassName());
-            }
+                break;
+            case NULL:
+                codeGetBuilder.addStatement("return value");
+                break;
+            case FROM_ID:
+                codeGetBuilder.beginControlFlow("if(value==null)");
+                MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
+                if (methodInfo == null) {
+                    canNotFindDefVal(annotationParams.getDefValFromId());
+                } else if (methodInfo.isMethod()) {
+                    if (methodInfo.getParamsNum() == 0) {
+                        codeGetBuilder.addStatement(StringUtils.format(
+                                "return $T.%s()", methodInfo.getName()), methodInfo.getClassName());
+                    } else if (methodInfo.getParamsNum() == 1) {
+                        codeGetBuilder.addStatement(StringUtils.format(
+                                "return $T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
+                                methodInfo.getClassName(), params.getFullClassName());
+                    } else {
+                        notSupportMethod(serializerMethod, 0, 1);
+                    }
+                } else {
+                    codeGetBuilder.addStatement(StringUtils.format(
+                            "return $T.%s", methodInfo.getName()), methodInfo.getClassName());
+                }
 
-            codeGetBuilder.nextControlFlow("else")
-                    .addStatement("return value")
-                    .endControlFlow();
+                codeGetBuilder.nextControlFlow("else")
+                        .addStatement("return value")
+                        .endControlFlow();
+                break;
         }
 
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getGetMethodName(params.getFiledName()))

@@ -1,15 +1,13 @@
 package com.mfz.prefsbuilder.annotationprocessor.data;
 
+import com.mfz.prefsbuilder.DefValSrc;
 import com.mfz.prefsbuilder.PrefsDefVal;
 import com.mfz.prefsbuilder.PrefsGenerateCtrl;
 import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.annotationprocessor.ElementHandler;
 import com.mfz.prefsbuilder.annotationprocessor.MethodUtils;
 import com.mfz.prefsbuilder.annotationprocessor.StringUtils;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.WildcardTypeName;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -24,9 +22,8 @@ import javax.lang.model.util.Elements;
  * @time 17:35
  */
 public class AnnotationParams {
-    private boolean mDefNull;
+    private DefValSrc mDefValSrc;
     private int mDefValFromId;
-    private boolean mDefEmpty;
     private String mDefString;
     private int mCodeId;
     private TypeName mPrefixTypeName;
@@ -41,9 +38,8 @@ public class AnnotationParams {
     private TypeName mEmptyTypeName;
 
     private AnnotationParams(Builder builder) {
-        setDefNull(builder.mDefNull);
+        setDefValSrc(builder.mDefValSrc);
         setDefValFromId(builder.mDefValFromId);
-        setDefEmpty(builder.mDefEmpty);
         setDefString(builder.mDefString);
         setCodeId(builder.mCodeId);
         setPrefixTypeName(builder.mPrefixTypeName);
@@ -58,16 +54,16 @@ public class AnnotationParams {
         setEmptyTypeName(builder.mEmptyTypeName);
     }
 
+    public DefValSrc getDefValSrc() {
+        return mDefValSrc;
+    }
+
+    public void setDefValSrc(DefValSrc defValSrc) {
+        mDefValSrc = defValSrc;
+    }
+
     public static Builder newBuilder() {
         return new Builder();
-    }
-
-    public boolean isDefNull() {
-        return mDefNull;
-    }
-
-    public void setDefNull(boolean defNull) {
-        mDefNull = defNull;
     }
 
     public int getDefValFromId() {
@@ -76,14 +72,6 @@ public class AnnotationParams {
 
     public void setDefValFromId(int defValFromId) {
         mDefValFromId = defValFromId;
-    }
-
-    public boolean isDefEmpty() {
-        return mDefEmpty;
-    }
-
-    public void setDefEmpty(boolean defEmpty) {
-        mDefEmpty = defEmpty;
     }
 
     public String getDefString() {
@@ -202,9 +190,8 @@ public class AnnotationParams {
                     emptyType = TypeName.get(defEmptyMap.get(annotationCls));
                 }
             }
-            builder.defValFromId(prefsDefVal.defValFromId())
-                    .defNull(prefsDefVal.defNull())
-                    .defEmpty(prefsDefVal.defEmpty())
+            builder.defValFromId(prefsDefVal.fromId())
+                    .defValSrc(prefsDefVal.defValSrc())
                     .defString(prefsDefVal.defString())
                     .emptyTypeName(emptyType);
         }
@@ -239,9 +226,8 @@ public class AnnotationParams {
 
     public Builder builder() {
         Builder builder = new Builder();
-        builder.mDefNull = isDefNull();
+        builder.mDefValSrc = getDefValSrc();
         builder.mDefValFromId = getDefValFromId();
-        builder.mDefEmpty = isDefEmpty();
         builder.mDefString = getDefString();
         builder.mCodeId = getCodeId();
         builder.mPrefixTypeName = getPrefixTypeName();
@@ -258,9 +244,7 @@ public class AnnotationParams {
     }
 
     public static final class Builder {
-        private boolean mDefNull;
         private int mDefValFromId;
-        private boolean mDefEmpty;
         private String mDefString;
         private int mCodeId;
         private TypeName mPrefixTypeName;
@@ -273,11 +257,11 @@ public class AnnotationParams {
         private String mSuffixParamName;
         private String mKeyStatement;
         private TypeName mEmptyTypeName;
+        private DefValSrc mDefValSrc;
 
         private Builder() {
-            mDefNull = true;
+            mDefValSrc = DefValSrc.DEFAULT;
             mDefValFromId = 0;
-            mDefEmpty = true;
             mDefString = "";
             mCodeId = 0;
             mPrefixTypeName = TypeName.VOID;
@@ -291,18 +275,8 @@ public class AnnotationParams {
             mKeyStatement = "$T.%s";
         }
 
-        public Builder defNull(boolean val) {
-            mDefNull = val;
-            return this;
-        }
-
         public Builder defValFromId(int val) {
             mDefValFromId = val;
-            return this;
-        }
-
-        public Builder defEmpty(boolean val) {
-            mDefEmpty = val;
             return this;
         }
 
@@ -368,6 +342,11 @@ public class AnnotationParams {
 
         public AnnotationParams build() {
             return new AnnotationParams(this);
+        }
+
+        public Builder defValSrc(DefValSrc val) {
+            mDefValSrc = val;
+            return this;
         }
     }
 }

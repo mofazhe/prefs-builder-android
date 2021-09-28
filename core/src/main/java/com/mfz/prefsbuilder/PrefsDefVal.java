@@ -15,36 +15,23 @@ import java.lang.annotation.Target;
 public @interface PrefsDefVal {
 
     /**
-     * 默认值是否为null，
-     * 若为true，{@link PrefsKey.String#defVal()}无效，
-     * {@link PrefsKey.String#defValFromId()}有效时，该值无效
+     * 默认值来源
      *
-     * @return 是否为null boolean
+     * @return the def val src
      */
-    boolean defNull() default true;
+    DefValSrc defValSrc() default DefValSrc.DEFAULT;
 
     /**
-     * 默认值的方法
-     * 优先级高
-     * 大于0时才有效
+     * 当{@link #defValSrc()}等于{@link DefValSrc#FROM_ID}时有效
      *
      * @return the int
      */
-    int defValFromId() default 0;
+    int fromId() default 0;
 
     /**
-     * 默认值是否为空列表，
-     * 优先级低于{@link #defNull()}
-     * {@link #defValFromId()}
-     * 集合类型专用
-     *
-     * @return 是否为null boolean
-     */
-    boolean defEmpty() default true;
-
-    /**
-     * 当集合类型要求返回空列表{@link #defEmpty()}时
+     * 当集合类型要求返回空列表时
      * 用该值指定实际的返回的类型
+     * 默认空类型定义在{@link com.mfz.prefsbuilder.annotationprocessor.AnnotationList#getDefEmptyMap()}
      *
      * @return the class
      */

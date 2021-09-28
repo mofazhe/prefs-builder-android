@@ -42,7 +42,7 @@ public class AnnotationList {
     }
 
     public static Map<Class<? extends Annotation>, Class<?>> getDefEmptyMap() {
-        Map<Class<? extends Annotation>, Class<?>> set = new HashMap<>(8);
+        Map<Class<? extends Annotation>, Class<?>> set = new HashMap<>(10);
         set.put(PrefsKey.List.class, ArrayList.class);
         set.put(PrefsKey.Set.class, HashSet.class);
         set.put(PrefsKey.Queue.class, LinkedList.class);
