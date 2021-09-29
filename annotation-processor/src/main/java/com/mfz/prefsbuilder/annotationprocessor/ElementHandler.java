@@ -610,10 +610,10 @@ public class ElementHandler {
                 .returns(params.getTypeName())
                 .addCode(codeGetBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         classBuilder.addMethod(methodBuilder.build());
 
@@ -642,21 +642,16 @@ public class ElementHandler {
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
 
-        if (annotationParams.isGenerateRemove()) {
-            addRemoveMethod(classBuilder, params);
-        }
-
-        if (annotationParams.isGenerateContains()) {
-            addContainsMethod(classBuilder, params);
-        }
+        addRemoveMethod(classBuilder, params);
+        addContainsMethod(classBuilder, params);
     }
 
     private void buildGenericMethod(TypeSpec.Builder classBuilder, KeyParams params) {
@@ -777,10 +772,10 @@ public class ElementHandler {
                 .returns(params.getTypeName())
                 .addCode(codeGetBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         classBuilder.addMethod(methodBuilder.build());
 
@@ -803,25 +798,23 @@ public class ElementHandler {
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
 
-        if (annotationParams.isGenerateRemove()) {
-            addRemoveMethod(classBuilder, params);
-        }
-
-        if (annotationParams.isGenerateContains()) {
-            addContainsMethod(classBuilder, params);
-        }
+        addRemoveMethod(classBuilder, params);
+        addContainsMethod(classBuilder, params);
     }
 
     private void addRemoveMethod(TypeSpec.Builder classBuilder, KeyParams params) {
         AnnotationParams annotationParams = params.getAnnotationParams();
+        if (!annotationParams.isGenerateRemove()) {
+            return;
+        }
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
@@ -833,10 +826,10 @@ public class ElementHandler {
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
@@ -844,6 +837,9 @@ public class ElementHandler {
 
     private void addContainsMethod(TypeSpec.Builder classBuilder, KeyParams params) {
         AnnotationParams annotationParams = params.getAnnotationParams();
+        if (!annotationParams.isGenerateContains()) {
+            return;
+        }
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
@@ -855,10 +851,10 @@ public class ElementHandler {
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
         if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixTypeName(), annotationParams.getPrefixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
         }
         if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixTypeName(), annotationParams.getSuffixParamName(), Modifier.FINAL);
+            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());

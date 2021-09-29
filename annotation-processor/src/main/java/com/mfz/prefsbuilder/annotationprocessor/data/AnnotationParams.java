@@ -7,11 +7,13 @@ import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.annotationprocessor.ElementHandler;
 import com.mfz.prefsbuilder.annotationprocessor.MethodUtils;
 import com.mfz.prefsbuilder.annotationprocessor.StringUtils;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
@@ -36,6 +38,8 @@ public class AnnotationParams {
     private String mSuffixParamName;
     private String mKeyStatement;
     private TypeName mEmptyTypeName;
+    private ParameterSpec mPrefixParameterSpec;
+    private ParameterSpec mSuffixParameterSpec;
 
     private AnnotationParams(Builder builder) {
         setDefValSrc(builder.mDefValSrc);
@@ -52,6 +56,8 @@ public class AnnotationParams {
         setSuffixParamName(builder.mSuffixParamName);
         setKeyStatement(builder.mKeyStatement);
         setEmptyTypeName(builder.mEmptyTypeName);
+        setPrefixParameterSpec(builder.mPrefixParameterSpec);
+        setSuffixParameterSpec(builder.mSuffixParameterSpec);
     }
 
     public DefValSrc getDefValSrc() {
@@ -170,6 +176,22 @@ public class AnnotationParams {
         mEmptyTypeName = emptyTypeName;
     }
 
+    public ParameterSpec getPrefixParameterSpec() {
+        return mPrefixParameterSpec;
+    }
+
+    public void setPrefixParameterSpec(ParameterSpec prefixParameterSpec) {
+        mPrefixParameterSpec = prefixParameterSpec;
+    }
+
+    public ParameterSpec getSuffixParameterSpec() {
+        return mSuffixParameterSpec;
+    }
+
+    public void setSuffixParameterSpec(ParameterSpec suffixParameterSpec) {
+        mSuffixParameterSpec = suffixParameterSpec;
+    }
+
     public static AnnotationParams create(ElementHandler handler,
                                           VariableElement element,
                                           Class<? extends Annotation> annotationCls) {
@@ -210,9 +232,17 @@ public class AnnotationParams {
         String keyStatement = "$T.%s";
         if (hasPrefix) {
             keyStatement = builder.mPrefixParamName + "+" + keyStatement;
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                    prefixType, builder.mPrefixParamName, Modifier.FINAL)
+                    .build();
+            builder.prefixParameterSpec(parameterSpec);
         }
         if (hasSuffix) {
             keyStatement = keyStatement + "+" + builder.mSuffixParamName;
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                    suffixType, builder.mSuffixParamName, Modifier.FINAL)
+                    .build();
+            builder.suffixParameterSpec(parameterSpec);
         }
         keyStatement = StringUtils.format(keyStatement, element.getSimpleName().toString());
 
@@ -240,6 +270,8 @@ public class AnnotationParams {
         builder.mSuffixParamName = getSuffixParamName();
         builder.mKeyStatement = getKeyStatement();
         builder.mEmptyTypeName = getEmptyTypeName();
+        builder.mPrefixParameterSpec = getPrefixParameterSpec();
+        builder.mSuffixParameterSpec = getSuffixParameterSpec();
         return builder;
     }
 
@@ -257,6 +289,8 @@ public class AnnotationParams {
         private String mSuffixParamName;
         private String mKeyStatement;
         private TypeName mEmptyTypeName;
+        private ParameterSpec mPrefixParameterSpec;
+        private ParameterSpec mSuffixParameterSpec;
         private DefValSrc mDefValSrc;
 
         private Builder() {
@@ -340,13 +374,23 @@ public class AnnotationParams {
             return this;
         }
 
-        public AnnotationParams build() {
-            return new AnnotationParams(this);
+        public Builder prefixParameterSpec(ParameterSpec val) {
+            mPrefixParameterSpec = val;
+            return this;
+        }
+
+        public Builder suffixParameterSpec(ParameterSpec val) {
+            mSuffixParameterSpec = val;
+            return this;
         }
 
         public Builder defValSrc(DefValSrc val) {
             mDefValSrc = val;
             return this;
+        }
+
+        public AnnotationParams build() {
+            return new AnnotationParams(this);
         }
     }
 }
