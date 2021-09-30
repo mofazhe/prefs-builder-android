@@ -228,26 +228,29 @@ public class AnnotationParams {
 
         boolean hasPrefix = prefixType != null && prefixType != TypeName.VOID;
         boolean hasSuffix = suffixType != null && suffixType != TypeName.VOID;
+        String prefixParamName = "prefix";
+        String suffixParamName = "suffix";
 
-        String keyStatement = "$T.%s";
+        String keyStatement = "$T." + element.getSimpleName().toString();
         if (hasPrefix) {
-            keyStatement = builder.mPrefixParamName + "+" + keyStatement;
+            keyStatement = prefixParamName + "+" + keyStatement;
             ParameterSpec parameterSpec = ParameterSpec.builder(
-                    prefixType, builder.mPrefixParamName, Modifier.FINAL)
+                    prefixType, prefixParamName, Modifier.FINAL)
                     .build();
             builder.prefixParameterSpec(parameterSpec);
         }
         if (hasSuffix) {
-            keyStatement = keyStatement + "+" + builder.mSuffixParamName;
+            keyStatement = keyStatement + "+" + suffixParamName;
             ParameterSpec parameterSpec = ParameterSpec.builder(
-                    suffixType, builder.mSuffixParamName, Modifier.FINAL)
+                    suffixType, suffixParamName, Modifier.FINAL)
                     .build();
             builder.suffixParameterSpec(parameterSpec);
         }
-        keyStatement = StringUtils.format(keyStatement, element.getSimpleName().toString());
 
         return builder.hasPrefix(hasPrefix)
                 .hasSuffix(hasSuffix)
+                .prefixParamName(prefixParamName)
+                .suffixParamName(suffixParamName)
                 .prefixTypeName(prefixType)
                 .suffixTypeName(suffixType)
                 .keyStatement(keyStatement)

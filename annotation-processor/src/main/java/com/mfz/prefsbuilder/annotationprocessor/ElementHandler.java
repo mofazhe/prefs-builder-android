@@ -521,11 +521,10 @@ public class ElementHandler {
     }
 
     public void addMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        if (params.isGenericVal()) {
-            buildGenericMethod(classBuilder, params);
-        } else {
-            buildBasicMethod(classBuilder, params);
-        }
+        addGetMethod(classBuilder, params);
+        addSetMethod(classBuilder, params);
+        addRemoveMethod(classBuilder, params);
+        addContainsMethod(classBuilder, params);
     }
 
     private ParameterizedTypeName getParameterizedTypedName(Class<?> clazz, TypeName... subTypeName) {
@@ -543,61 +542,160 @@ public class ElementHandler {
         return typeName;
     }
 
-    private void buildBasicMethod(TypeSpec.Builder classBuilder, KeyParams params) {
+    private void addGetMethod(TypeSpec.Builder classBuilder, KeyParams params) {
         AnnotationParams annotationParams = params.getAnnotationParams();
-
         MethodSpec.Builder methodBuilder;
-        MethodInfo methodInfo;
-
-        // get方法
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
-        methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
-        if (annotationParams.getDefValSrc() == DefValSrc.FROM_ID
-                && methodInfo == null) {
-            canNotFindDefVal(annotationParams.getDefValFromId());
-        }
-        if (methodInfo == null) {
+        String keyParamName = "key";
+        codeGetBuilder.addStatement(CodeBlock.builder()
+                .add("String $L=", keyParamName)
+                .add(annotationParams.getKeyStatement(), params.getFullClassName())
+                .build());
+
+        if (params.isGenericVal()) {
+            Class<? extends Annotation> annotationType = params.getAnnotation().annotationType();
+
+            MethodInfo deserializerMethod = null;
+            for (Class<? extends Annotation> cls : AnnotationList.getDeserializerList(annotationType)) {
+                deserializerMethod = mRuleMethodMap.get(cls);
+                if (deserializerMethod == null) {
+                    continue;
+                }
+                break;
+            }
+            if (deserializerMethod == null) {
+                canNotFindMethod(annotationType, false);
+            }
+            ClassName deserializerClass = deserializerMethod.getClassName();
+            String deserializerName = deserializerMethod.getName();
+            String valueName = "String";
+
+            codeGetBuilder.addStatement("$T json = getInstance().get$L($L, $L)",
+                    mStringTypeName, valueName, keyParamName, null);
+            CodeBlock.Builder deserializerCode = CodeBlock.builder()
+                    .add("$T value=", params.getTypeName())
+                    .add("$T.$L", deserializerClass, deserializerName);
+            if (params.getValTypeName() == null) {
+                if (deserializerMethod.getParamsNum() == 2) {
+                    deserializerCode.add("(json,$T.class)", params.getKeyTypeName());
+                } else if (deserializerMethod.getParamsNum() == 3) {
+                    deserializerCode.add("($L,json,$T.class)",
+                            keyParamName, params.getKeyTypeName());
+                } else {
+                    notSupportMethod(deserializerMethod, 2, 3);
+                }
+            } else {
+                if (deserializerMethod.getParamsNum() == 3) {
+                    deserializerCode.add("(json,$T.class,$T.class)",
+                            params.getKeyTypeName(), params.getValTypeName());
+                } else if (deserializerMethod.getParamsNum() == 4) {
+                    deserializerCode.add("($L,json,$T.class,$T.class)",
+                            keyParamName, params.getKeyTypeName(), params.getValTypeName());
+                } else {
+                    notSupportMethod(deserializerMethod, 3, 4);
+                }
+            }
+            codeGetBuilder.addStatement(deserializerCode.build());
+            // switch (annotationParams.getDefValSrc()) {
+            //     default:
+            //     case DEFAULT:
+            //         if (annotationType == PrefsKey.Object.class) {
+            //             codeGetBuilder.addStatement("return value");
+            //         } else {
+            //             codeGetBuilder.beginControlFlow("if(value==null)");
+            //             codeGetBuilder.addStatement("return new $T<>()", annotationParams.getEmptyTypeName());
+            //             codeGetBuilder.nextControlFlow("else")
+            //                     .addStatement("return value")
+            //                     .endControlFlow();
+            //         }
+            //         break;
+            //     case NULL:
+            //         codeGetBuilder.addStatement("return value");
+            //         break;
+            //     case FROM_ID:
+            //         codeGetBuilder.beginControlFlow("if(value==null)");
+            //         MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
+            //         if (methodInfo == null) {
+            //             canNotFindDefVal(annotationParams.getDefValFromId());
+            //         } else if (methodInfo.isMethod()) {
+            //             if (methodInfo.getParamsNum() == 0) {
+            //                 codeGetBuilder.addStatement(StringUtils.format(
+            //                         "return $T.%s()", methodInfo.getName()), methodInfo.getClassName());
+            //             } else if (methodInfo.getParamsNum() == 1) {
+            //                 codeGetBuilder.addStatement(StringUtils.format(
+            //                         "return $T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
+            //                         methodInfo.getClassName(), params.getFullClassName());
+            //             } else {
+            //                 notSupportMethod(methodInfo, 0, 1);
+            //             }
+            //         } else {
+            //             codeGetBuilder.addStatement(StringUtils.format(
+            //                     "return $T.%s", methodInfo.getName()), methodInfo.getClassName());
+            //         }
+            //
+            //         codeGetBuilder.nextControlFlow("else")
+            //                 .addStatement("return value")
+            //                 .endControlFlow();
+            //         break;
+            // }
+        } else {
+            // MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
+            // if (annotationParams.getDefValSrc() == DefValSrc.FROM_ID
+            //         && methodInfo == null) {
+            //     canNotFindDefVal(annotationParams.getDefValFromId());
+            // }
+            // if (methodInfo == null) {
+            //     // string类型非空时需要处理特殊字符
+            //     if (mStringTypeName.equals(params.getTypeName()) && params.getDefValue() != null) {
+            //         codeGetBuilder.addStatement("$T defVal=$S", params.getTypeName(), String.valueOf(params.getDefValue()));
+            //     } else {
+            //         codeGetBuilder.addStatement("$T defVal=$L", params.getTypeName(), String.valueOf(params.getDefValue()));
+            //     }
+            // } else if (methodInfo.isMethod()) {
+            //     if (methodInfo.getParamsNum() == 0) {
+            //         codeGetBuilder.addStatement(
+            //                 "$T defVal=$T.$L()", params.getTypeName(), methodInfo.getClassName(), methodInfo.getName());
+            //     } else if (methodInfo.getParamsNum() == 1) {
+            //         codeGetBuilder.addStatement(StringUtils.format(
+            //                 "$T defVal=$T.$L(%s)", annotationParams.getKeyStatement()),
+            //                 params.getTypeName(), methodInfo.getClassName(), methodInfo.getName(), params.getFullClassName());
+            //     } else {
+            //         notSupportMethod(methodInfo, 0, 1);
+            //     }
+            // } else {
+            //     codeGetBuilder.addStatement(
+            //             "$T defVal=$T.$L", params.getTypeName(), methodInfo.getClassName(), methodInfo.getName());
+            // }
+            // methodInfo = mDecodeMethodMap.get(annotationParams.getCodeId());
+            // if (mStringTypeName != params.getTypeName() || methodInfo == null) {
+            //     codeGetBuilder.addStatement(
+            //             StringUtils.format("return getInstance().get%s(%s, defVal)",
+            //                     params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
+            // } else {
+            //     codeGetBuilder.addStatement(
+            //             StringUtils.format("$T s=getInstance().get%s(%s, defVal)",
+            //                     params.getValueName(), annotationParams.getKeyStatement()), mStringTypeName, params.getFullClassName());
+            //     if (methodInfo.getParamsNum() == 1) {
+            //         codeGetBuilder.addStatement(StringUtils.format("return $T.%s(s)",
+            //                 methodInfo.getName()), methodInfo.getClassName());
+            //     } else if (methodInfo.getParamsNum() == 2) {
+            //         codeGetBuilder.addStatement(StringUtils.format("return $T.%s(%s, s)",
+            //                 methodInfo.getName(), annotationParams.getKeyStatement()), methodInfo.getClassName());
+            //     } else {
+            //         notSupportMethod(methodInfo, 1, 2);
+            //     }
+            // }
+
             // string类型非空时需要处理特殊字符
             if (mStringTypeName.equals(params.getTypeName()) && params.getDefValue() != null) {
                 codeGetBuilder.addStatement("$T defVal=$S", params.getTypeName(), String.valueOf(params.getDefValue()));
             } else {
-                codeGetBuilder.addStatement(
-                        StringUtils.format("$T defVal=%s", String.valueOf(params.getDefValue())), params.getTypeName());
+                codeGetBuilder.addStatement("$T defVal=$L", params.getTypeName(), String.valueOf(params.getDefValue()));
             }
-        } else if (methodInfo.isMethod()) {
-            if (methodInfo.getParamsNum() == 0) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T defVal=$T.%s()", methodInfo.getName()), params.getTypeName(), methodInfo.getClassName());
-            } else if (methodInfo.getParamsNum() == 1) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T defVal=$T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
-                        params.getTypeName(), methodInfo.getClassName(), params.getFullClassName());
-            } else {
-                notSupportMethod(methodInfo, 0, 1);
-            }
-        } else {
-            codeGetBuilder.addStatement(StringUtils.format(
-                    "$T defVal=$T.%s", methodInfo.getName()), params.getTypeName(), methodInfo.getClassName());
+            codeGetBuilder.addStatement("$T value=getInstance().get$L($L, defVal)",
+                    params.getTypeName(), params.getValueName(), keyParamName);
         }
-        methodInfo = mDecodeMethodMap.get(annotationParams.getCodeId());
-        if (mStringTypeName != params.getTypeName() || methodInfo == null) {
-            codeGetBuilder.addStatement(
-                    StringUtils.format("return getInstance().get%s(%s, defVal)",
-                            params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
-        } else {
-            codeGetBuilder.addStatement(
-                    StringUtils.format("$T s=getInstance().get%s(%s, defVal)",
-                            params.getValueName(), annotationParams.getKeyStatement()), mStringTypeName, params.getFullClassName());
-            if (methodInfo.getParamsNum() == 1) {
-                codeGetBuilder.addStatement(StringUtils.format("return $T.%s(s)",
-                        methodInfo.getName()), methodInfo.getClassName());
-            } else if (methodInfo.getParamsNum() == 2) {
-                codeGetBuilder.addStatement(StringUtils.format("return $T.%s(%s, s)",
-                        methodInfo.getName(), annotationParams.getKeyStatement()), methodInfo.getClassName());
-            } else {
-                notSupportMethod(methodInfo, 1, 2);
-            }
-        }
+        codeGetBuilder.addStatement("return value");
 
         String getMethodName;
         if (params.getTypeName() == TypeName.BOOLEAN) {
@@ -616,184 +714,68 @@ public class ElementHandler {
             methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
         classBuilder.addMethod(methodBuilder.build());
-
-        // set方法
-        CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        methodInfo = mEncodeMethodMap.get(annotationParams.getCodeId());
-        if (mStringTypeName != params.getTypeName() || methodInfo == null) {
-            codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, value)", params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
-        } else {
-            if (methodInfo.getParamsNum() == 1) {
-                codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(value)",
-                        methodInfo.getName()), mStringTypeName, methodInfo.getClassName());
-            } else if (methodInfo.getParamsNum() == 2) {
-                codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(%s, value)",
-                        methodInfo.getName(), annotationParams.getKeyStatement()), mStringTypeName, methodInfo.getClassName());
-            } else {
-                notSupportMethod(methodInfo, 1, 2);
-            }
-            codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, encode)", params.getValueName(), annotationParams.getKeyStatement()), params.getFullClassName());
-        }
-
-        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getSetMethodName(params.getFiledName()))
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(TypeName.VOID)
-                .addCode(codeSetBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
-        }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
-        }
-        methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
-        classBuilder.addMethod(methodBuilder.build());
-
-        addRemoveMethod(classBuilder, params);
-        addContainsMethod(classBuilder, params);
     }
 
-    private void buildGenericMethod(TypeSpec.Builder classBuilder, KeyParams params) {
+    private void addSetMethod(TypeSpec.Builder classBuilder, KeyParams params) {
         AnnotationParams annotationParams = params.getAnnotationParams();
-
-        MethodSpec.Builder methodBuilder;
-        String valueName = "String";
-        MethodInfo serializerMethod = null;
-        ClassName serializerClass = null;
-        String serializerName = null;
-        Class<? extends Annotation> annotationType = params.getAnnotation().annotationType();
-        for (Class<? extends Annotation> cls : AnnotationList.getSerializerList(annotationType)) {
-            serializerMethod = mRuleMethodMap.get(cls);
-            if (serializerMethod == null) {
-                continue;
-            }
-            serializerClass = serializerMethod.getClassName();
-            serializerName = serializerMethod.getName();
-            break;
-        }
-        if (serializerMethod == null) {
-            canNotFindMethod(annotationType, true);
-        }
-
-        MethodInfo deserializerMethod = null;
-        ClassName deserializerClass = null;
-        String deserializerName = null;
-        for (Class<? extends Annotation> cls : AnnotationList.getDeserializerList(annotationType)) {
-            deserializerMethod = mRuleMethodMap.get(cls);
-            if (deserializerMethod == null) {
-                continue;
-            }
-            deserializerClass = deserializerMethod.getClassName();
-            deserializerName = deserializerMethod.getName();
-            break;
-        }
-        if (deserializerMethod == null) {
-            canNotFindMethod(annotationType, false);
-        }
-
-        // get方法
-        CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
-        codeGetBuilder.addStatement(StringUtils.format(
-                "$T json = getInstance().get%s(%s, $S)",
-                valueName, annotationParams.getKeyStatement()), mStringTypeName, params.getFullClassName(), annotationParams.getDefString());
-        if (params.getValTypeName() == null) {
-            if (deserializerMethod.getParamsNum() == 2) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T value = $T.%s(json,$T.class)",
-                        deserializerName), params.getTypeName(), deserializerClass, params.getKeyTypeName());
-            } else if (deserializerMethod.getParamsNum() == 3) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T value = $T.%s(%s,json,$T.class)",
-                        deserializerName, annotationParams.getKeyStatement()), params.getTypeName(), deserializerClass,
-                        params.getFullClassName(), params.getKeyTypeName());
-            } else {
-                notSupportMethod(serializerMethod, 2, 3);
-            }
-        } else {
-            if (deserializerMethod.getParamsNum() == 3) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T value = $T.%s(json,$T.class,$T.class)",
-                        deserializerName), params.getTypeName(), deserializerClass, params.getKeyTypeName(), params.getValTypeName());
-            } else if (deserializerMethod.getParamsNum() == 4) {
-                codeGetBuilder.addStatement(StringUtils.format(
-                        "$T value = $T.%s(%s,json,$T.class,$T.class)",
-                        deserializerName, annotationParams.getKeyStatement()), params.getTypeName(), deserializerClass,
-                        params.getFullClassName(), params.getKeyTypeName(), params.getValTypeName());
-            } else {
-                notSupportMethod(serializerMethod, 3, 4);
-            }
-        }
-        switch (annotationParams.getDefValSrc()) {
-            default:
-            case DEFAULT:
-                if (annotationType == PrefsKey.Object.class) {
-                    codeGetBuilder.addStatement("return value");
-                } else {
-                    codeGetBuilder.beginControlFlow("if(value==null)");
-                    codeGetBuilder.addStatement("return new $T<>()", annotationParams.getEmptyTypeName());
-                    codeGetBuilder.nextControlFlow("else")
-                            .addStatement("return value")
-                            .endControlFlow();
-                }
-                break;
-            case NULL:
-                codeGetBuilder.addStatement("return value");
-                break;
-            case FROM_ID:
-                codeGetBuilder.beginControlFlow("if(value==null)");
-                MethodInfo methodInfo = mDefaultMethodMap.get(annotationParams.getDefValFromId());
-                if (methodInfo == null) {
-                    canNotFindDefVal(annotationParams.getDefValFromId());
-                } else if (methodInfo.isMethod()) {
-                    if (methodInfo.getParamsNum() == 0) {
-                        codeGetBuilder.addStatement(StringUtils.format(
-                                "return $T.%s()", methodInfo.getName()), methodInfo.getClassName());
-                    } else if (methodInfo.getParamsNum() == 1) {
-                        codeGetBuilder.addStatement(StringUtils.format(
-                                "return $T.%s(%s)", methodInfo.getName(), annotationParams.getKeyStatement()),
-                                methodInfo.getClassName(), params.getFullClassName());
-                    } else {
-                        notSupportMethod(serializerMethod, 0, 1);
-                    }
-                } else {
-                    codeGetBuilder.addStatement(StringUtils.format(
-                            "return $T.%s", methodInfo.getName()), methodInfo.getClassName());
-                }
-
-                codeGetBuilder.nextControlFlow("else")
-                        .addStatement("return value")
-                        .endControlFlow();
-                break;
-        }
-
-        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getGetMethodName(params.getFiledName()))
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(params.getTypeName())
-                .addCode(codeGetBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
-        }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
-        }
-        classBuilder.addMethod(methodBuilder.build());
-
-        // set方法
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
-        if (serializerMethod.getParamsNum() == 1) {
-            codeSetBuilder.addStatement(StringUtils.format("getInstance().set%s(%s, $T.%s(value))",
-                    valueName, annotationParams.getKeyStatement(), serializerName), params.getFullClassName(), serializerClass);
-        } else if (serializerMethod.getParamsNum() == 2) {
-            codeSetBuilder.addStatement(StringUtils.format(
-                    "getInstance().set%s(%s, $T.%s(%s,value))",
-                    valueName, annotationParams.getKeyStatement(), serializerName, annotationParams.getKeyStatement()),
-                    params.getFullClassName(), serializerClass, params.getFullClassName());
+        String keyParamName = "key";
+        String valueParamName = "value";
+        String finalValParamName = "finalVal";
+        codeSetBuilder.addStatement(CodeBlock.builder()
+                .add("String $L=", keyParamName)
+                .add(annotationParams.getKeyStatement(), params.getFullClassName())
+                .build());
+        if (params.isGenericVal()) {
+            MethodInfo serializerMethod = null;
+            Class<? extends Annotation> annotationType = params.getAnnotation().annotationType();
+            for (Class<? extends Annotation> cls : AnnotationList.getSerializerList(annotationType)) {
+                serializerMethod = mRuleMethodMap.get(cls);
+                if (serializerMethod == null) {
+                    continue;
+                }
+                break;
+            }
+            if (serializerMethod == null) {
+                canNotFindMethod(annotationType, true);
+            }
+            ClassName serializerClass = serializerMethod.getClassName();
+            String serializerName = serializerMethod.getName();
+            CodeBlock.Builder serializerCode = CodeBlock.builder()
+                    .add("$T $L=$T.$L",
+                            mStringTypeName, finalValParamName, serializerClass, serializerName);
+            if (serializerMethod.getParamsNum() == 1) {
+                serializerCode.add("($L)", valueParamName);
+            } else if (serializerMethod.getParamsNum() == 2) {
+                serializerCode.add("($L,$L)", keyParamName, valueParamName);
+            } else {
+                notSupportMethod(serializerMethod, 1, 2);
+            }
+            codeSetBuilder.addStatement(serializerCode.build());
         } else {
-            notSupportMethod(serializerMethod, 1, 2);
+            // MethodInfo methodInfo = mEncodeMethodMap.get(annotationParams.getCodeId());
+            // if (mStringTypeName != params.getTypeName() || methodInfo == null) {
+            // codeSetBuilder.addStatement(StringUtils.format(
+            //         "getInstance().set%s(%s, value)", params.getValueName(), keyParamName), params.getFullClassName());
+            // } else {
+            //     if (methodInfo.getParamsNum() == 1) {
+            //         codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(value)",
+            //                 methodInfo.getName()), mStringTypeName, methodInfo.getClassName());
+            //     } else if (methodInfo.getParamsNum() == 2) {
+            //         codeSetBuilder.addStatement(StringUtils.format("$T encode=$T.%s(%s, value)",
+            //                 methodInfo.getName(), keyParamName), mStringTypeName, methodInfo.getClassName());
+            //     } else {
+            //         notSupportMethod(methodInfo, 1, 2);
+            //     }
+            //     codeSetBuilder.addStatement(StringUtils.format(
+            //             "getInstance().set%s(%s, encode)", params.getValueName(), keyParamName));
+            // }
+            codeSetBuilder.addStatement("$T $L=$L", params.getTypeName(), finalValParamName, valueParamName);
         }
+        codeSetBuilder.addStatement(
+                "getInstance().set$L($L, finalVal)", params.getValueName(), keyParamName);
 
-        methodBuilder = MethodSpec.methodBuilder(MethodUtils.getSetMethodName(params.getFiledName()))
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(MethodUtils.getSetMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
@@ -803,11 +785,8 @@ public class ElementHandler {
         if (annotationParams.isHasSuffix()) {
             methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
         }
-        methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
+        methodBuilder.addParameter(params.getTypeName(), valueParamName, Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
-
-        addRemoveMethod(classBuilder, params);
-        addContainsMethod(classBuilder, params);
     }
 
     private void addRemoveMethod(TypeSpec.Builder classBuilder, KeyParams params) {

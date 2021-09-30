@@ -26,7 +26,7 @@ public class TestPrefsConst {
     }
 
     @DefaultValue(id = 155)
-    public static byte getByte() {
+    public static byte getByte(String key) {
         return 1;
     }
 

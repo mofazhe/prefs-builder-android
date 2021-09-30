@@ -89,6 +89,7 @@ public class PrefsConst {
 
     @PrefsKey.Byte(defVal = 12)
     @PrefsDefVal(fromId = 155)
+    @PrefsKeyHeadTail(prefixType = String.class, suffixType = String.class)
     public static final String TEST_BYTE = "a";
 
     @PrefsKey.Double(defVal = 102.2435235)
@@ -129,7 +130,7 @@ public class PrefsConst {
     public static final String TEST_LIST = "d";
 
     @PrefsKey.List(type = Test.class)
-    @PrefsDefVal(defValSrc = DefValSrc.DEFAULT,emptyType = LinkedList.class)
+    @PrefsDefVal(defValSrc = DefValSrc.DEFAULT, emptyType = LinkedList.class)
     public static final String TEST_LIST_EMPTY = "d";
 
     @PrefsKey.Set(type = Test.class)
