@@ -12,7 +12,13 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-public @interface PrefsKeyHeadTail {
+public @interface PrefsKeyPrefixSuffix {
+    /**
+     * 前缀的变量名字
+     *
+     * @return the string
+     */
+    String prefixFieldName() default "prefix";
 
     /**
      * key的前缀class类型
@@ -21,6 +27,13 @@ public @interface PrefsKeyHeadTail {
      * @return the class
      */
     Class<?> prefixType() default void.class;
+
+    /**
+     * 后缀的变量名字
+     *
+     * @return the string
+     */
+    String suffixFieldName() default "suffix";
 
     /**
      * key的后缀class类型.

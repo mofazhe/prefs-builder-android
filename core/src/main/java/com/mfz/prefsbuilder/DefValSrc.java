@@ -13,7 +13,7 @@ public enum DefValSrc {
      * 1.基础类型时，为defVal的值，比如int类型为{@link PrefsKey.Int#defVal()}
      * 2.{@link String}类型时，为{@link PrefsKey.String#defVal()};
      * 3.集合类型时，为空集合，空集合类型由{@link PrefsDefVal#emptyType()}定义
-     * 4.其他对象时，为空对象
+     * 4.其他类型时，为空对象
      */
     DEFAULT,
     /**

@@ -1,11 +1,22 @@
 package com.mfz.prefsbuilder.annotationprocessor.data;
 
+import com.mfz.prefsbuilder.DefValSrc;
+import com.mfz.prefsbuilder.PrefsDefVal;
+import com.mfz.prefsbuilder.PrefsGenerateCtrl;
+import com.mfz.prefsbuilder.PrefsParams;
+import com.mfz.prefsbuilder.annotationprocessor.ElementHandler;
+import com.mfz.prefsbuilder.annotationprocessor.MethodUtils;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 
 /**
  * @author cjj
@@ -20,12 +31,21 @@ public class KeyParams {
     private ClassName mFullClassName;
     private String mFullClassStr;
     private TypeName mTypeName;
-    private AnnotationParams mAnnotationParams;
     private Annotation mAnnotation;
     private TypeName mKeyTypeName;
     private TypeName mValTypeName;
     private boolean mGenericVal;
     private VariableElement mElement;
+    private DefValSrc mDefValSrc;
+    private int mDefValFromId;
+    private String mDefString;
+    private int mCodecId;
+    private boolean mGenerateRemove;
+    private boolean mGenerateContains;
+    private String mKeyStatement;
+    private TypeName mEmptyTypeName;
+    private PrefixSuffixParams mSuffixParams;
+    private PrefixSuffixParams mPrefixParams;
 
     private KeyParams(Builder builder) {
         setFiledName(builder.mFiledName);
@@ -34,12 +54,21 @@ public class KeyParams {
         setFullClassName(builder.mFullClassName);
         setFullClassStr(builder.mFullClassStr);
         setTypeName(builder.mTypeName);
-        setAnnotationParams(builder.mAnnotationParams);
         setAnnotation(builder.mAnnotation);
         setKeyTypeName(builder.mKeyTypeName);
         setValTypeName(builder.mValTypeName);
         setGenericVal(builder.mGenericVal);
         setElement(builder.mElement);
+        setDefValSrc(builder.mDefValSrc);
+        setDefValFromId(builder.mDefValFromId);
+        setDefString(builder.mDefString);
+        setCodecId(builder.mCodecId);
+        setGenerateRemove(builder.mGenerateRemove);
+        setGenerateContains(builder.mGenerateContains);
+        setKeyStatement(builder.mKeyStatement);
+        setEmptyTypeName(builder.mEmptyTypeName);
+        setSuffixParams(builder.mSuffixParams);
+        setPrefixParams(builder.mPrefixParams);
     }
 
     public static Builder newBuilder() {
@@ -94,14 +123,6 @@ public class KeyParams {
         mTypeName = typeName;
     }
 
-    public AnnotationParams getAnnotationParams() {
-        return mAnnotationParams;
-    }
-
-    public void setAnnotationParams(AnnotationParams annotationParams) {
-        mAnnotationParams = annotationParams;
-    }
-
     public Annotation getAnnotation() {
         return mAnnotation;
     }
@@ -142,6 +163,161 @@ public class KeyParams {
         mElement = element;
     }
 
+    public DefValSrc getDefValSrc() {
+        return mDefValSrc;
+    }
+
+    public void setDefValSrc(DefValSrc defValSrc) {
+        mDefValSrc = defValSrc;
+    }
+
+    public int getDefValFromId() {
+        return mDefValFromId;
+    }
+
+    public void setDefValFromId(int defValFromId) {
+        mDefValFromId = defValFromId;
+    }
+
+    public String getDefString() {
+        return mDefString;
+    }
+
+    public void setDefString(String defString) {
+        mDefString = defString;
+    }
+
+    public int getCodecId() {
+        return mCodecId;
+    }
+
+    public void setCodecId(int codecId) {
+        mCodecId = codecId;
+    }
+
+    public boolean isGenerateRemove() {
+        return mGenerateRemove;
+    }
+
+    public void setGenerateRemove(boolean generateRemove) {
+        mGenerateRemove = generateRemove;
+    }
+
+    public boolean isGenerateContains() {
+        return mGenerateContains;
+    }
+
+    public void setGenerateContains(boolean generateContains) {
+        mGenerateContains = generateContains;
+    }
+
+    public String getKeyStatement() {
+        return mKeyStatement;
+    }
+
+    public void setKeyStatement(String keyStatement) {
+        mKeyStatement = keyStatement;
+    }
+
+    public TypeName getEmptyTypeName() {
+        return mEmptyTypeName;
+    }
+
+    public void setEmptyTypeName(TypeName emptyTypeName) {
+        mEmptyTypeName = emptyTypeName;
+    }
+
+    public PrefixSuffixParams getSuffixParams() {
+        return mSuffixParams;
+    }
+
+    public void setSuffixParams(PrefixSuffixParams suffixParams) {
+        mSuffixParams = suffixParams;
+    }
+
+    public PrefixSuffixParams getPrefixParams() {
+        return mPrefixParams;
+    }
+
+    public void setPrefixParams(PrefixSuffixParams prefixParams) {
+        mPrefixParams = prefixParams;
+    }
+
+    public static KeyParams.Builder create(ElementHandler handler,
+                                           VariableElement element,
+                                           Annotation annotation) {
+        Class<? extends Annotation> annotationCls = annotation.annotationType();
+        KeyParams.Builder builder = KeyParams.newBuilder();
+        Elements elementUtils = handler.getElementUtils();
+
+        PrefsParams prefParams = element.getAnnotation(PrefsParams.class);
+        if (prefParams != null) {
+            builder.codecId(prefParams.codecId());
+        }
+        PrefsDefVal prefsDefVal = element.getAnnotation(PrefsDefVal.class);
+        if (prefsDefVal != null) {
+            Map<Class<? extends Annotation>, Class<?>> defEmptyMap = handler.getDefEmptyMap();
+            TypeName emptyType = null;
+            if (defEmptyMap.containsKey(annotationCls)) {
+                emptyType = MethodUtils.getEmptyType(element, elementUtils);
+                if (emptyType == null || TypeName.VOID.equals(emptyType)) {
+                    emptyType = TypeName.get(defEmptyMap.get(annotationCls));
+                }
+            }
+            builder.defValFromId(prefsDefVal.fromId())
+                    .defValSrc(prefsDefVal.defValSrc())
+                    .defString(prefsDefVal.defString())
+                    .emptyTypeName(emptyType);
+        }
+        PrefsGenerateCtrl generateCtrl = element.getAnnotation(PrefsGenerateCtrl.class);
+        if (generateCtrl != null) {
+            builder.generateRemove(generateCtrl.generateRemove())
+                    .generateContains(generateCtrl.generateContains());
+        }
+
+        String keyStatement = "$T." + element.getSimpleName().toString();
+
+        PrefixSuffixParams.Builder prefixBuilder = PrefixSuffixParams.newBuilder();
+        TypeName prefixType = MethodUtils.getPrefixType(element, elementUtils);
+        if (prefixType != null && prefixType != TypeName.VOID) {
+            String prefixParamName = "prefix";
+            keyStatement = prefixParamName + "+" + keyStatement;
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                    prefixType, prefixParamName, Modifier.FINAL)
+                    .build();
+            prefixBuilder.parameterSpec(parameterSpec)
+                    .need(true)
+                    .paramName(prefixParamName)
+                    .typeName(prefixType);
+        }
+        TypeName suffixType = MethodUtils.getSuffixType(element, elementUtils);
+        PrefixSuffixParams.Builder suffixBuilder = PrefixSuffixParams.newBuilder();
+        if (suffixType != null && suffixType != TypeName.VOID) {
+            String suffixParamName = "suffix";
+            keyStatement = keyStatement + "+" + suffixParamName;
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                    suffixType, suffixParamName, Modifier.FINAL)
+                    .build();
+            suffixBuilder.parameterSpec(parameterSpec)
+                    .need(true)
+                    .paramName(suffixParamName)
+                    .typeName(suffixType);
+        }
+
+        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
+        String fullClassStr = enclosingElement.getQualifiedName().toString();
+        return builder
+                .keyStatement(keyStatement)
+                .prefixParams(prefixBuilder.build())
+                .suffixParams(suffixBuilder.build())
+                .element(element)
+                .annotation(annotation)
+                .fullClassName(ClassName.bestGuess(fullClassStr))
+                .fullClassStr(fullClassStr)
+                .filedName(element.getSimpleName().toString())
+                .valueName("String");
+    }
+
     public Builder builder() {
         Builder builder = new Builder();
         builder.mFiledName = getFiledName();
@@ -150,12 +326,21 @@ public class KeyParams {
         builder.mFullClassName = getFullClassName();
         builder.mFullClassStr = getFullClassStr();
         builder.mTypeName = getTypeName();
-        builder.mAnnotationParams = getAnnotationParams();
         builder.mAnnotation = getAnnotation();
         builder.mKeyTypeName = getKeyTypeName();
         builder.mValTypeName = getValTypeName();
         builder.mGenericVal = isGenericVal();
         builder.mElement = getElement();
+        builder.mDefValSrc = getDefValSrc();
+        builder.mDefValFromId = getDefValFromId();
+        builder.mDefString = getDefString();
+        builder.mCodecId = getCodecId();
+        builder.mGenerateRemove = isGenerateRemove();
+        builder.mGenerateContains = isGenerateContains();
+        builder.mKeyStatement = getKeyStatement();
+        builder.mEmptyTypeName = getEmptyTypeName();
+        builder.mSuffixParams = getSuffixParams();
+        builder.mPrefixParams = getPrefixParams();
         return builder;
     }
 
@@ -166,12 +351,21 @@ public class KeyParams {
         private ClassName mFullClassName;
         private String mFullClassStr;
         private TypeName mTypeName;
-        private AnnotationParams mAnnotationParams;
         private Annotation mAnnotation;
         private TypeName mKeyTypeName;
         private TypeName mValTypeName;
         private boolean mGenericVal;
         private VariableElement mElement;
+        private DefValSrc mDefValSrc;
+        private int mDefValFromId;
+        private String mDefString;
+        private int mCodecId;
+        private boolean mGenerateRemove;
+        private boolean mGenerateContains;
+        private String mKeyStatement;
+        private TypeName mEmptyTypeName;
+        private PrefixSuffixParams mSuffixParams;
+        private PrefixSuffixParams mPrefixParams;
 
         private Builder() {
         }
@@ -206,11 +400,6 @@ public class KeyParams {
             return this;
         }
 
-        public Builder annotationParams(AnnotationParams val) {
-            mAnnotationParams = val;
-            return this;
-        }
-
         public Builder annotation(Annotation val) {
             mAnnotation = val;
             return this;
@@ -233,6 +422,56 @@ public class KeyParams {
 
         public Builder element(VariableElement val) {
             mElement = val;
+            return this;
+        }
+
+        public Builder defValSrc(DefValSrc val) {
+            mDefValSrc = val;
+            return this;
+        }
+
+        public Builder defValFromId(int val) {
+            mDefValFromId = val;
+            return this;
+        }
+
+        public Builder defString(String val) {
+            mDefString = val;
+            return this;
+        }
+
+        public Builder codecId(int val) {
+            mCodecId = val;
+            return this;
+        }
+
+        public Builder generateRemove(boolean val) {
+            mGenerateRemove = val;
+            return this;
+        }
+
+        public Builder generateContains(boolean val) {
+            mGenerateContains = val;
+            return this;
+        }
+
+        public Builder keyStatement(String val) {
+            mKeyStatement = val;
+            return this;
+        }
+
+        public Builder emptyTypeName(TypeName val) {
+            mEmptyTypeName = val;
+            return this;
+        }
+
+        public Builder suffixParams(PrefixSuffixParams val) {
+            mSuffixParams = val;
+            return this;
+        }
+
+        public Builder prefixParams(PrefixSuffixParams val) {
+            mPrefixParams = val;
             return this;
         }
 

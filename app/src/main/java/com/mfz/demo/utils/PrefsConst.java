@@ -6,7 +6,7 @@ import com.mfz.prefsbuilder.DefValSrc;
 import com.mfz.prefsbuilder.DefaultValue;
 import com.mfz.prefsbuilder.PrefsDefVal;
 import com.mfz.prefsbuilder.PrefsGenerateCtrl;
-import com.mfz.prefsbuilder.PrefsKeyHeadTail;
+import com.mfz.prefsbuilder.PrefsKeyPrefixSuffix;
 import com.mfz.prefsbuilder.PrefsParams;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
@@ -89,7 +89,7 @@ public class PrefsConst {
 
     @PrefsKey.Byte(defVal = 12)
     @PrefsDefVal(fromId = 155)
-    @PrefsKeyHeadTail(prefixType = String.class, suffixType = String.class)
+    @PrefsKeyPrefixSuffix(prefixType = String.class, suffixType = String.class)
     public static final String TEST_BYTE = "a";
 
     @PrefsKey.Double(defVal = 102.2435235)
@@ -98,7 +98,7 @@ public class PrefsConst {
 
     @PrefsKey.Char(defVal = 's')
     @PrefsDefVal(fromId = 177)
-    @PrefsKeyHeadTail(prefixType = byte.class)
+    @PrefsKeyPrefixSuffix(prefixType = byte.class)
     public static final String TEST_CHAR = "a";
 
     @PrefsKey.Short(defVal = 234)
@@ -108,7 +108,7 @@ public class PrefsConst {
 
     @PrefsKey.String()
     @PrefsDefVal(fromId = 111)
-    @PrefsKeyHeadTail(prefixType = float.class, suffixType = double.class)
+    @PrefsKeyPrefixSuffix(prefixType = float.class, suffixType = double.class)
     public static final String TEST_STRING = "b";
 
     @PrefsKey.String(defVal = "[\"foo\", {\"bar\": [\"baz\", null, 1.0, 2]}]")
@@ -118,7 +118,7 @@ public class PrefsConst {
     @PrefsKey.String()
     @PrefsDefVal(defValSrc = DefValSrc.NULL)
     @PrefsParams(codecId = 1)
-    @PrefsKeyHeadTail(prefixType = String.class, suffixType = int.class)
+    @PrefsKeyPrefixSuffix(prefixType = String.class, suffixType = int.class)
     public static final String TEST_STRING_BASE64 = "b";
 
     @PrefsKey.Object(type = Test.class)
@@ -143,12 +143,12 @@ public class PrefsConst {
 
     @PrefsKey.Queue(type = String.class)
     @PrefsDefVal(defValSrc = DefValSrc.FROM_ID, fromId = 4)
-    @PrefsKeyHeadTail(suffixType = String.class)
+    @PrefsKeyPrefixSuffix(suffixType = String.class)
     public static final String TEST_QUEUE = "f";
 
     @PrefsKey.Deque(type = Test.class)
     @PrefsDefVal(defValSrc = DefValSrc.FROM_ID, fromId = 5)
-    @PrefsKeyHeadTail(prefixType = int.class)
+    @PrefsKeyPrefixSuffix(prefixType = int.class)
     public static final String TEST_DEQUE = "g";
 
     @PrefsKey.Deque(type = Test.class)

@@ -1,12 +1,10 @@
 package com.mfz.prefsbuilder.annotationprocessor;
 
 import com.mfz.prefsbuilder.BasePrefsClass;
-import com.mfz.prefsbuilder.DefValSrc;
 import com.mfz.prefsbuilder.DefaultValue;
 import com.mfz.prefsbuilder.PrefsClass;
 import com.mfz.prefsbuilder.PrefsKey;
 import com.mfz.prefsbuilder.StringCodec;
-import com.mfz.prefsbuilder.annotationprocessor.data.AnnotationParams;
 import com.mfz.prefsbuilder.annotationprocessor.data.KeyParams;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -349,14 +347,10 @@ public class ElementHandler {
             }
             PrefsKey.String annotation = element.getAnnotation(PrefsKey.String.class);
             VariableElement variableElement = (VariableElement) element;
-            AnnotationParams annotationParams = AnnotationParams.create(this,
-                    variableElement,
-                    annotation.annotationType());
-            addToClassMap(createKeyParamsWithout(variableElement, annotation)
+            addToClassMap(createKeyParams(variableElement, annotation)
                     .typeName(mStringTypeName)
-                    .defValue(annotationParams.getDefValSrc() == DefValSrc.NULL ? null : annotation.defVal())
+                    .defValue(annotation.defVal())
                     .valueName("String")
-                    .annotationParams(annotationParams)
                     .build());
         }
 
@@ -425,37 +419,12 @@ public class ElementHandler {
     }
 
     public KeyParams.Builder createKeyParams(VariableElement element, Class<? extends Annotation> annotationCls) {
-        AnnotationParams annotationParams = AnnotationParams.create(this, element, annotationCls);
-
-        return createKeyParamsWithout(element, annotationCls)
-                .annotationParams(annotationParams);
+        Annotation annotation = element.getAnnotation(annotationCls);
+        return createKeyParams(element, annotation);
     }
 
     public KeyParams.Builder createKeyParams(VariableElement element, Annotation annotation) {
-        AnnotationParams annotationParams = AnnotationParams.create(this,
-                element,
-                annotation.annotationType());
-
-        return createKeyParamsWithout(element, annotation)
-                .annotationParams(annotationParams);
-    }
-
-    public KeyParams.Builder createKeyParamsWithout(VariableElement element, Class<? extends Annotation> annotationCls) {
-        Annotation annotation = element.getAnnotation(annotationCls);
-        return createKeyParamsWithout(element, annotation);
-    }
-
-    public KeyParams.Builder createKeyParamsWithout(VariableElement element, Annotation annotation) {
-        TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
-        String fullClassStr = enclosingElement.getQualifiedName().toString();
-
-        return KeyParams.newBuilder()
-                .element((VariableElement) element)
-                .annotation(annotation)
-                .fullClassName(ClassName.bestGuess(fullClassStr))
-                .fullClassStr(fullClassStr)
-                .filedName(element.getSimpleName().toString())
-                .valueName("String");
+        return KeyParams.create(this, element, annotation);
     }
 
     public void createJavaFiles() {
@@ -543,13 +512,12 @@ public class ElementHandler {
     }
 
     private void addGetMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        AnnotationParams annotationParams = params.getAnnotationParams();
         MethodSpec.Builder methodBuilder;
         CodeBlock.Builder codeGetBuilder = CodeBlock.builder();
         String keyParamName = "key";
         codeGetBuilder.addStatement(CodeBlock.builder()
                 .add("String $L=", keyParamName)
-                .add(annotationParams.getKeyStatement(), params.getFullClassName())
+                .add(params.getKeyStatement(), params.getFullClassName())
                 .build());
 
         if (params.isGenericVal()) {
@@ -707,24 +675,23 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(params.getTypeName())
                 .addCode(codeGetBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
+        if (params.getPrefixParams().isNeed()) {
+            methodBuilder.addParameter(params.getPrefixParams().getParameterSpec());
         }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
+        if (params.getSuffixParams().isNeed()) {
+            methodBuilder.addParameter(params.getSuffixParams().getParameterSpec());
         }
         classBuilder.addMethod(methodBuilder.build());
     }
 
     private void addSetMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        AnnotationParams annotationParams = params.getAnnotationParams();
         CodeBlock.Builder codeSetBuilder = CodeBlock.builder();
         String keyParamName = "key";
         String valueParamName = "value";
         String finalValParamName = "finalVal";
         codeSetBuilder.addStatement(CodeBlock.builder()
                 .add("String $L=", keyParamName)
-                .add(annotationParams.getKeyStatement(), params.getFullClassName())
+                .add(params.getKeyStatement(), params.getFullClassName())
                 .build());
         if (params.isGenericVal()) {
             MethodInfo serializerMethod = null;
@@ -779,61 +746,59 @@ public class ElementHandler {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.VOID)
                 .addCode(codeSetBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
+        if (params.getPrefixParams().isNeed()) {
+            methodBuilder.addParameter(params.getPrefixParams().getParameterSpec());
         }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
+        if (params.getSuffixParams().isNeed()) {
+            methodBuilder.addParameter(params.getSuffixParams().getParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), valueParamName, Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
     }
 
     private void addRemoveMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        AnnotationParams annotationParams = params.getAnnotationParams();
-        if (!annotationParams.isGenerateRemove()) {
+        if (!params.isGenerateRemove()) {
             return;
         }
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().remove(%s)", annotationParams.getKeyStatement()), params.getFullClassName());
+                "return getInstance().remove(%s)", params.getKeyStatement()), params.getFullClassName());
 
         MethodSpec.Builder methodBuilder;
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getRemoveMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
+        if (params.getPrefixParams().isNeed()) {
+            methodBuilder.addParameter(params.getPrefixParams().getParameterSpec());
         }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
+        if (params.getSuffixParams().isNeed()) {
+            methodBuilder.addParameter(params.getSuffixParams().getParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
     }
 
     private void addContainsMethod(TypeSpec.Builder classBuilder, KeyParams params) {
-        AnnotationParams annotationParams = params.getAnnotationParams();
-        if (!annotationParams.isGenerateContains()) {
+        if (!params.isGenerateContains()) {
             return;
         }
 
         CodeBlock.Builder codeRemoveBuilder = CodeBlock.builder();
         codeRemoveBuilder.addStatement(StringUtils.format(
-                "return getInstance().contains(%s)", annotationParams.getKeyStatement()), params.getFullClassName());
+                "return getInstance().contains(%s)", params.getKeyStatement()), params.getFullClassName());
 
         MethodSpec.Builder methodBuilder;
         methodBuilder = MethodSpec.methodBuilder(MethodUtils.getContainsMethodName(params.getFiledName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(TypeName.BOOLEAN)
                 .addCode(codeRemoveBuilder.build());
-        if (annotationParams.isHasPrefix()) {
-            methodBuilder.addParameter(annotationParams.getPrefixParameterSpec());
+        if (params.getPrefixParams().isNeed()) {
+            methodBuilder.addParameter(params.getPrefixParams().getParameterSpec());
         }
-        if (annotationParams.isHasSuffix()) {
-            methodBuilder.addParameter(annotationParams.getSuffixParameterSpec());
+        if (params.getSuffixParams().isNeed()) {
+            methodBuilder.addParameter(params.getSuffixParams().getParameterSpec());
         }
         methodBuilder.addParameter(params.getTypeName(), "value", Modifier.FINAL);
         classBuilder.addMethod(methodBuilder.build());
